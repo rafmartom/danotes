@@ -15,24 +15,24 @@ import argparse
 # @description Description
 
 
-def block_show(json, text, buid, label):
+def block_show(json, text, buid, label, filename):
     """Show a determined Dan Block Object"""
-    print(f"Showing {json=} {text=} {buid=} {label=}")
+    print(f"Showing {json=} {text=} {buid=} {label=} {filename=}")
 
 
-def block_write(json, text, buid, label):
+def block_write(json, text, buid, label, filename):
     """Write in-place a determined Dan Block Object"""
-    print(f"Writing {json=} {text=} {buid=} {label=}")
+    print(f"Writing {json=} {text=} {buid=} {label=} {filename=}")
 
 
-def link_show(json, text, buid, label):
+def link_show(json, text, buid, label, filename):
     """Show a determined Dan link Object"""
-    print(f"Showing {json=} {text=} {buid=} {label=}")
+    print(f"Showing {json=} {text=} {buid=} {label=} {filename=}")
 
 
-def link_write(json, text, buid, label):
+def link_write(json, text, buid, label, filename):
     """Write in-place a determined Dan link Object"""
-    print(f"Writing {json=} {text=} {buid=} {label=}")
+    print(f"Writing {json=} {text=} {buid=} {label=} {filename=}")
 
 
 ## EOF EOF EOF CLI_HANDLER_FUNCTIONS 
@@ -66,18 +66,28 @@ block_subparsers = block_parser.add_subparsers(dest="subcommand", required=True)
 
 # block show
 block_show_parser = block_subparsers.add_parser("show", help=block_show.__doc__, description=block_show.__doc__)
-block_show_parser.add_argument("--json", action="store_true", default=False)
-block_show_parser.add_argument("--text", action="store_true", default=True)
-block_show_parser.add_argument("-b", "--buid")
-block_show_parser.add_argument("-l", "--label")
+block_show_parser_outputtype = block_show_parser.add_mutually_exclusive_group()
+block_show_parser_outputtype.add_argument("--json", action="store_true", default=False)
+block_show_parser_outputtype.add_argument("--text", action="store_true", default=True)
+
+block_show_parser_filterby = block_show_parser.add_mutually_exclusive_group(required=True)
+block_show_parser_filterby.add_argument("-b", "--buid")
+block_show_parser_filterby.add_argument("-l", "--label")
+
+block_show_parser.add_argument("filename", nargs="?", help="Path to .dan file (or stdin if omitted)")
 
 # block write
 block_write_parser = block_subparsers.add_parser("write", help=block_write.__doc__, description=block_write.__doc__)
-block_write_parser.add_argument("--json", action="store_true", default=False)
-block_write_parser.add_argument("--text", action="store_true", default=True)
-block_write_parser.add_argument("-b", "--buid")
-block_write_parser.add_argument("-l", "--label")
 
+block_write_parser_outputtype = block_write_parser.add_mutually_exclusive_group()
+block_write_parser_outputtype.add_argument("--json", action="store_true", default=False)
+block_write_parser_outputtype.add_argument("--text", action="store_true", default=True)
+
+block_write_parser_filterby = block_write_parser.add_mutually_exclusive_group(required=True)
+block_write_parser_filterby.add_argument("-b", "--buid")
+block_write_parser_filterby.add_argument("-l", "--label")
+
+block_write_parser.add_argument("filename", nargs="?", help="Path to .dan file (or stdin if omitted)")
 
 ## EOF EOF EOF BLOCK 
 ## ----------------------------------------------------------------------------
@@ -93,17 +103,29 @@ link_subparsers = link_parser.add_subparsers(dest="subcommand", required=True)
 
 # link show
 link_show_parser = link_subparsers.add_parser("show", help=link_show.__doc__, description=link_show.__doc__)
-link_show_parser.add_argument("--json", action="store_true", default=False)
-link_show_parser.add_argument("--text", action="store_true", default=True)
-link_show_parser.add_argument("-b", "--buid")
-link_show_parser.add_argument("-l", "--label")
+
+link_show_parser_outputtype = link_show_parser.add_mutually_exclusive_group()
+link_show_parser_outputtype.add_argument("--json", action="store_true", default=False)
+link_show_parser_outputtype.add_argument("--text", action="store_true", default=True)
+
+link_show_parser_filterby = link_show_parser.add_mutually_exclusive_group(required=True)
+link_show_parser_filterby.add_argument("-b", "--buid")
+link_show_parser_filterby.add_argument("-l", "--label")
+
+link_show_parser.add_argument("filename", nargs="?", help="Path to .dan file (or stdin if omitted)")
 
 # link write
 link_write_parser = link_subparsers.add_parser("write", help=link_write.__doc__, description=link_write.__doc__)
-link_write_parser.add_argument("--json", action="store_true", default=False)
-link_write_parser.add_argument("--text", action="store_true", default=True)
-link_write_parser.add_argument("-b", "--buid")
-link_write_parser.add_argument("-l", "--label")
+
+link_write_parser_outputtype = link_write_parser.add_mutually_exclusive_group()
+link_write_parser_outputtype.add_argument("--json", action="store_true", default=False)
+link_write_parser_outputtype.add_argument("--text", action="store_true", default=True)
+
+link_write_parser_filterby =  link_write_parser.add_mutually_exclusive_group(required=True)
+link_write_parser_filterby.add_argument("-b", "--buid")
+link_write_parser_filterby.add_argument("-l", "--label")
+
+link_write_parser.add_argument("filename", nargs="?", help="Path to .dan file (or stdin if omitted)")
 
 ## EOF EOF EOF LINK 
 ## ----------------------------------------------------------------------------
@@ -119,15 +141,15 @@ args = parser.parse_args()
 
 if args.command == "block":
     if args.subcommand == "show":
-        block_show(args.json, args.text, args.buid, args.label)
+        block_show(args.json, args.text, args.buid, args.label, args.filename)
     elif args.subcommand == "write":
-        block_write(args.json, args.text, args.buid, args.label)
+        block_write(args.json, args.text, args.buid, args.label, args.filename)
 
 elif args.command == "link":
     if args.subcommand == "show":
-        link_show(args.json, args.text, args.buid, args.label)
+        link_show(args.json, args.text, args.buid, args.label, args.filename)
     elif args.subcommand == "write":
-        link_write(args.json, args.text, args.buid, args.label)
+        link_write(args.json, args.text, args.buid, args.label, args.filename)
 
 
 ## EOF EOF EOF PARSE_AND_DISPATCH 
