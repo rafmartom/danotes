@@ -3,6 +3,23 @@
 Standalone program to manipulate Notes files on .dan format from vim-dan
 
 
+## Installation
+
+```
+python3 -m venv venv
+pip install -e .
+danotes --help
+```
+
+## Help System
+
+Use the help system to guide you through the CLI Interface
+
+```
+danotes --help
+danotes block --help
+danotes block write --help
+```
 
 ## System Explained
 
