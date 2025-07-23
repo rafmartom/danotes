@@ -165,3 +165,48 @@ As the markup is minimum, it can be visualized without any special text-editor, 
 Created for automated Indexing of Documentations with [vim-dan-generator](https://github.com/rafmartom/vim-dan-generator), extended now for the use of personal notes.
 
 With `danotes` you can pipe text coming from any source and append it as new blocks, new text into an existing document. Doing it manually, integrated in your text editor, creating new Links, new Articles, or Batch Automate from the `CLI`.
+
+
+
+## Program outline
+
+
+User should be able to take either a Block or a Inline  and perform one of these action; Show or Write
+The most important commands you can give is:
+
+
+```
+stdin | danotes block write --buid <buid> <file.dan>
+```
+If --buid is non-existent will create the Title and lower boundaries of the Article , `-l  <label>` is preferable to use on there. Stdin will be text within the article.
+You cannot write to --buid 0 or 1
+If --json or --text , the output will be to stdout
+
+
+
+```
+danotes block show --buid <buid> --json --text
+```
+If no --json or --text is selected , will update the block in place
+ -l can be used instead of --buid, but have to be unambiguous.
+If no buid , will default to all the document iterating from 0 to last
+
+
+```
+danotes block update --buid <buid>
+```
+It is an alias of `danotes block show ` without --json or --text. So will modify that certain block.
+Will update in place the determined block (useful to refresh block 0, 1, or any block for the TOC) , if no --buid is given will iterate all the document from <buid>=0 to last.
+
+
+```
+dannotes link write -b <buid>
+```
+Will create a link in a certain article on the next available -i <iid>
+If --json or --text is given output  will be showing it to stdout (in that case -id <iid> is required)
+
+```
+dannotes link show -b <buid> -i <iid> --text --json
+```
+--text will be the output by default and will give out the <label> otherwise will output the <json> object
+
