@@ -3,6 +3,11 @@
 Standalone program to manipulate Notes files on .dan format from vim-dan
 
 
+## Developer note
+
+The project is under current development and basic functionalities are not yet working.
+At the moment and for allowing not breaking backwards compatibility with `.dan` files , it is using `.dano` files as extension.
+
 ## Installation
 
 ```
@@ -92,7 +97,7 @@ Block `buid = 1` is the General TOC of the document. Full of **DAN link sources*
 Example
 
 ```
-<B=0>General TOC
+<B=1>General TOC
  _____ ___   ____
 |_   _/ _ \ / ___|
   | || | | | |
@@ -103,7 +108,7 @@ Example
 - <L=1>First Article</L>
 - <L=2>Second Article</L>
 
-</B><L=0>To General TOC</L>
+</B><L=1>To General TOC</L>
 =========================================================================================================
 ```
 
@@ -116,7 +121,7 @@ From `block = 2` onwards they are all Article blocks, they share the same struct
 - The lower boundary of the block `</B>...` followed by a horizontal line of equal signs `=`
 
 ```
-<B=1>First Article
+<B=2>First Article
  _____ _          _        _         _   _      _
 |  ___(_)_ __ ___| |_     / \   _ __| |_(_) ___| | ___
 | |_  | | '__/ __| __|   / _ \ | '__| __| |/ __| |/ _ \
@@ -140,9 +145,9 @@ console.log(myVar)
 <I=1#2>Part B</I>
 <I=1#3>Part C</I>
 
-</B><L=0>To General TOC</L> | <L=1>To Article Top</L>
+</B><L=1>To General TOC</L> | <L=2>To Article Top</L>
 =========================================================================================================
-<B=2>Second Article
+<B=3>Second Article
  ____                           _      _         _   _      _
 / ___|  ___  ___ ___  _ __   __| |    / \   _ __| |_(_) ___| | ___
 \___ \ / _ \/ __/ _ \| '_ \ / _` |   / _ \ | '__| __| |/ __| |/ _ \
@@ -157,7 +162,7 @@ console.log(myVar)
 <I=2#1>Part A</I>
 <I=2#2>Part B</I>
 
-</B><L=0>To General TOC</L> | <L=2>To Article Top</L>
+</B><L=1>To General TOC</L> | <L=3>To Article Top</L>
 =========================================================================================================
 ```
 
@@ -227,3 +232,20 @@ dannotes link show -b <buid> -i <iid> --text --json
 ```
 --text will be the output by default and will give out the <label> otherwise will output the <json> object
 
+
+
+## Pending to add in tests
+
+```
+danotes block show test-sample/new-format.dano --buid 1
+danotes block show test-sample/new-format.dano --buid 1 --text
+danotes block show test-sample/new-format.dano --buid 2 --text
+danotes block show test-sample/new-format.dano --buid --text
+danotes block show test-sample/new-format.dano --text
+danotes block show test-sample/new-format.dano --json
+danotes block show test-sample/new-format.dano --buid 01
+danotes block show test-sample/new-format.dano --buid 1
+danotes block show test-sample/new-format.dano --buid 1 --text
+danotes block show test-sample/new-format.dano --label 'Table of Contents TOC' --text
+danotes block show test-sample/new-format.dano --label 'Table of Contents TOC' --json
+```

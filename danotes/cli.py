@@ -61,8 +61,8 @@ def main():
     block_write_parser = block_subparsers.add_parser("write", help=block_write.__doc__, description=block_write.__doc__)
 
     block_write_parser_outputtype = block_write_parser.add_mutually_exclusive_group()
-    block_write_parser_outputtype.add_argument("--json", help="Output to stdout as Danom Object", action="store_true", default=False)
-    block_write_parser_outputtype.add_argument("--text", help="Output to stdout as formated dan text", action="store_true", default=False)
+    block_write_parser_outputtype.add_argument("--json", help="Output to stdout as Danom Object", action="store_true")
+    block_write_parser_outputtype.add_argument("--text", help="Output to stdout as formated dan text", action="store_true")
 
     block_write_parser_filterby = block_write_parser.add_mutually_exclusive_group(required=True)
     block_write_parser_filterby.add_argument("-b", "--buid", help="Target Block by buid")
@@ -77,10 +77,10 @@ def main():
     # block show
     block_show_parser = block_subparsers.add_parser("show", help=block_show.__doc__, description=block_show.__doc__)
     block_show_parser_outputtype = block_show_parser.add_mutually_exclusive_group()
-    block_show_parser_outputtype.add_argument("--json", help="Output to stdout as Danom Object", action="store_true", default=False)
-    block_show_parser_outputtype.add_argument("--text", help="Output to stdout as formated dan text", action="store_true", default=True)
+    block_show_parser_outputtype.add_argument("--json", help="Output to stdout as Danom Object", action="store_true")
+    block_show_parser_outputtype.add_argument("--text", help="Output to stdout as formated dan text", action="store_true")
 
-    block_show_parser_filterby = block_show_parser.add_mutually_exclusive_group(required=True)
+    block_show_parser_filterby = block_show_parser.add_mutually_exclusive_group()
     block_show_parser_filterby.add_argument("-b", "--buid", help="Target Block by buid")
     block_show_parser_filterby.add_argument("-l", "--label", help="Target Block by label (must be unambiguous)")
 
@@ -103,8 +103,8 @@ def main():
     link_write_parser = link_subparsers.add_parser("write", help=link_write.__doc__, description=link_write.__doc__)
 
     link_write_parser_outputtype = link_write_parser.add_mutually_exclusive_group()
-    link_write_parser_outputtype.add_argument("--json", help="Output to stdout as Danom Object", action="store_true", default=False)
-    link_write_parser_outputtype.add_argument("--text", help="Output to stdout as formated dan text", action="store_true", default=False)
+    link_write_parser_outputtype.add_argument("--json", help="Output to stdout as Danom Object", action="store_true")
+    link_write_parser_outputtype.add_argument("--text", help="Output to stdout as formated dan text", action="store_true")
 
     link_write_parser_filterby =  link_write_parser.add_mutually_exclusive_group(required=True)
     link_write_parser_filterby.add_argument("-b", "--buid", help="Target Block by buid")
@@ -120,8 +120,8 @@ def main():
     link_show_parser = link_subparsers.add_parser("show", help=link_show.__doc__, description=link_show.__doc__)
 
     link_show_parser_outputtype = link_show_parser.add_mutually_exclusive_group()
-    link_show_parser_outputtype.add_argument("--json", help="Output to stdout as Danom Object", action="store_true", default=False)
-    link_show_parser_outputtype.add_argument("--text", help="Output to stdout as formated dan text", action="store_true", default=True)
+    link_show_parser_outputtype.add_argument("--json", help="Output to stdout as Danom Object", action="store_true")
+    link_show_parser_outputtype.add_argument("--text", help="Output to stdout as formated dan text", action="store_true")
 
     link_show_parser_filterby = link_show_parser.add_mutually_exclusive_group(required=True)
     link_show_parser_filterby.add_argument("-b", "--buid", help="Target Link buid")

@@ -1,0 +1,99 @@
+<B=0>Danotes Header
+           _       _                                      
+  __ _  __| | ___ | |__   ___       _ __  _ __  _ __ ___  
+ / _` |/ _` |/ _ \| '_ \ / _ \_____| '_ \| '_ \| '__/ _ \ 
+| (_| | (_| | (_) | |_) |  __/_____| |_) | |_) | | | (_) |
+ \__,_|\__,_|\___/|_.__/ \___|     | .__/| .__/|_|  \___/ 
+                                   |_|   |_|              
+                                                                           
+         88                                                                
+         88                                     ,d                         
+         88                                     88                         
+ ,adPPYb,88 ,adPPYYba, 8b,dPPYba,   ,adPPYba, MM88MMM ,adPPYba, ,adPPYba,  
+a8"    `Y88 ""     `Y8 88P'   `"8a a8"     "8a  88   a8P_____88 I8[    ""  
+8b       88 ,adPPPPP88 88       88 8b       d8  88   8PP"""""""  `"Y8ba,   
+"8a,   ,d88 88,    ,88 88       88 "8a,   ,a8"  88,  "8b,   ,aa aa    ]8I  
+ `"8bbdP"Y8 `"8bbdP"Y8 88       88  `"YbbdP"'   "Y888 `"Ybbd8"' `"YbbdP"'  
+
+
+The following lines are used by danotes, modify them only if you know !
+
+dan_ext_list: ["javascript"]
+dan_kw_question_list: ["^Description"]
+dan_kw_nontext_list: ["^Parameters", "^Type"]
+dan_kw_linenr_list: ["^Parameter "]
+dan_kw_warningmsg_list: ["^Returns"]
+dan_kw_colorcolumn_list: []
+dan_kw_underlined_list: []
+dan_kw_preproc_list: []
+dan_kw_comment_list: []
+dan_kw_identifier_list: []
+dan_kw_ignore_list: []
+dan_kw_statement_list: []
+dan_kw_cursorline_list: []
+dan_kw_tabline_list: []
+dan_wrap_lines: 105
+dan_indexed_from: "https://ppro-scripting.docsforadobe.dev/"
+dan_parsed_on: []
+dan_title: "adobe-ppro"
+dan_description: "" 
+dan_tags: []
+</B>
+=========================================================================================================
+<B=1>Table of Contents TOC
+ _____ ___   ____
+|_   _/ _ \ / ___|
+  | || | | | |
+  | || |_| | |___
+  |_| \___/ \____|
+
+- <L=0>Table of Contents TOC</L>
+- <L=1>First Article</L>
+- <L=2>Second Article</L>
+
+</B><L=1>To TOC</L>
+=========================================================================================================
+<B=2>First Article
+ _____ _          _        _         _   _      _
+|  ___(_)_ __ ___| |_     / \   _ __| |_(_) ___| | ___
+| |_  | | '__/ __| __|   / _ \ | '__| __| |/ __| |/ _ \
+|  _| | | |  \__ \ |_   / ___ \| |  | |_| | (__| |  __/
+|_|   |_|_|  |___/\__| /_/   \_\_|   \__|_|\___|_|\___|
+
+
+- <L=1#1>Part A</L>
+- <L=1#2>Part B</L>
+- <L=1#3>Part C</L>
+<T>
+
+<I=1#1>Part A</I>
+Some text here explaining something
+
+```javascript
+var myVar = "this code";
+console.log(myVar)
+```
+
+<I=1#2>Part B</I>
+<I=1#3>Part C</I>
+
+</B><L=1>To TOC</L> | <L=2>Back to Article Top</L>
+=========================================================================================================
+<B=3>Second Article
+ ____                           _      _         _   _      _
+/ ___|  ___  ___ ___  _ __   __| |    / \   _ __| |_(_) ___| | ___
+\___ \ / _ \/ __/ _ \| '_ \ / _` |   / _ \ | '__| __| |/ __| |/ _ \
+ ___) |  __/ (_| (_) | | | | (_| |  / ___ \| |  | |_| | (__| |  __/
+|____/ \___|\___\___/|_| |_|\__,_| /_/   \_\_|   \__|_|\___|_|\___|
+
+
+- <L=2#1>Part A</L>
+- <L=2#2>Part B</L>
+<T>
+
+<I=2#1>Part A</I>
+<I=2#2>Part B</I>
+
+
+</B><L=1>To TOC</L> | <L=3>Back to Article Top</L>
+=========================================================================================================
