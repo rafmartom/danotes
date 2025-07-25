@@ -3,6 +3,37 @@ from .handlers.block import *
 from .handlers.link import *
 
 
+## ----------------------------------------------------------------------------
+# @section TRAMPOLINE_FUNCTIONS
+# @description This functions are defined so the CLI Prints out the return 
+#   statement of the library functions
+
+
+def cli_block_write(args):
+    result = block_write(path=args.path, buid=args.buid, query=args.query, new_label=args.new_label, json=args.json, text=args.text)
+    if result is not None:
+        print(result)
+
+def cli_block_show(args):
+    result = block_show(path=args.path, buid=args.buid, label=args.label, json=args.json, text=args.text)
+    if result is not None:
+        print(result)
+
+def cli_link_write(args):
+    result = link_write(path=args.path, buid=args.buid, uuid=args.uuid, label=args.label, json=args.json, text=args.text)
+    if result is not None:
+        print(result)
+
+def cli_link_show(args):
+    result = link_show(path=args.path, buid=args.buid, uuid=args.uuid, label=args.label, json=args.json, text=args.text)
+    if result is not None:
+        print(result)
+
+
+## EOF EOF EOF TRAMPOLINE_FUNCTIONS 
+## ----------------------------------------------------------------------------
+
+
 
 def main():
     ## ----------------------------------------------------------------------------
@@ -145,16 +176,16 @@ def main():
 
     if args.command == "block":
         if args.subcommand == "write":
-            block_write(args.path, args.buid, args.query, args.label, json=args.json, text=args.text)
+            cli_block_write(args)
 
         elif args.subcommand == "show":
-            block_show(args.path, args.buid, args.label, json=args.json, text=args.text)
+            cli_block_show(args)
 
     elif args.command == "link":
         if args.subcommand == "write":
-            link_write(args.path, args.buid, args.uuid, args.label, json=args.json, text=args.text)
+            cli_link_write(args)
         elif args.subcommand == "show":
-            link_show(args.path, args.buid, args.uuid, args.label, json=args.json, text=args.text)
+            cli_link_show(args)
 
 
     ## EOF EOF EOF PARSE_AND_DISPATCH 

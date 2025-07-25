@@ -7,7 +7,7 @@ def block_write(path, buid, query, label, json, text):
     print(f"Writing {json=} {text=} {buid=} {path=} {query=} {label=} ")
 
 
-def block_show(path, buid, label, json, text):
+def block_show(path, buid=None, label=None, json=False, text=False):
     """Show and update a determined Dan Block Object
     If no --json and --text are given. Update in place the determined block
     If no --buid or --label are given. Show all the document from buid=0 to last
@@ -19,25 +19,25 @@ def block_show(path, buid, label, json, text):
 
     if not label and not buid:
         if json:
-            print(danom_to_json(danom))
-            return
+            return danom_to_json(danom)
         elif text:
+            output = []
             for block in danom:
-                print(block.get_content())
-                print('=' * 105)
-            return
+                output.append(block.get_content())
+                output.append('=' * 105)
+            return '\n'.join(output)
         else:
-            print(danom_to_json(danom))
-            return
+            return 
     if label:
         block = get_block_by_label(danom, label)
     else:
         block = get_block_by_buid(danom, buid)
-    if text:
-        print(block.get_content())
-        return
+    if json:
+        return block.to_json()
+    elif text:
+        return block.get_content()
     else:
-        print(block.to_json())
+        return 
 
 
 

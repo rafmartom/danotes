@@ -234,18 +234,27 @@ dannotes link show -b <buid> -i <iid> --text --json
 
 
 
-## Pending to add in tests
+## Pending to add in tests of the CLI Handlers and module itself
 
 ```
+danotes block show test-sample/new-format.dano
+python3 -c 'from danotes import *; func_return = block_show("test-sample/new-format.dano") ; print(func_return)'
+
 danotes block show test-sample/new-format.dano --buid 1
-danotes block show test-sample/new-format.dano --buid 1 --text
-danotes block show test-sample/new-format.dano --buid 2 --text
-danotes block show test-sample/new-format.dano --buid --text
+python3 -c 'from danotes import *; func_return = block_show("test-sample/new-format.dano", buid="1") ; print(func_return)'
+
+danotes block show test-sample/new-format.dano --buid 1 --json
+python3 -c 'from danotes import *; func_return = block_show("test-sample/new-format.dano", buid="1", json=True) ; print(func_return)'
+
 danotes block show test-sample/new-format.dano --text
+python3 -c 'from danotes import *; func_return = block_show("test-sample/new-format.dano", text=True) ; print(func_return)'
+
 danotes block show test-sample/new-format.dano --json
-danotes block show test-sample/new-format.dano --buid 01
-danotes block show test-sample/new-format.dano --buid 1
-danotes block show test-sample/new-format.dano --buid 1 --text
+python3 -c 'from danotes import *; func_return = block_show("test-sample/new-format.dano", json=True) ; print(func_return)'
+
 danotes block show test-sample/new-format.dano --label 'Table of Contents TOC' --text
+python3 -c 'from danotes import *; func_return = block_show("test-sample/new-format.dano", label="Table of Contents TOC", text=True) ; print(func_return)'
+
 danotes block show test-sample/new-format.dano --label 'Table of Contents TOC' --json
+python3 -c 'from danotes import *; func_return = block_show("test-sample/new-format.dano", label="Table of Contents TOC", json=True) ; print(func_return)'
 ```
