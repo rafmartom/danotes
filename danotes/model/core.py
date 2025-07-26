@@ -31,7 +31,6 @@ class Block(DanObject):
             'content': self.content  # Already a list (JSON-compatible)
         }
 
-
     ## Output methods -----------------
     def to_json(self, indent: int = 2) -> str:
         """Serialize the Block to a JSON string."""
@@ -42,8 +41,25 @@ class Block(DanObject):
 
     def render_content(self) -> str:
         """Get the Content of the Block with a horizontal line <hr> at the end"""
-        content_str = self.get_content()
+        content_str = self.get_header()
+        content_str = content_str + self.get_content()
+        content_str = content_str + f'\n</B><L=1>To Document TOC</L> | <L={self.buid}>Back to Article Top</L>\n'
         return content_str + ('=' * 105) + "\n"
+
+    def get_header(self) -> str:
+        output = []
+
+        output.append(f"<B={self.buid}>{self.label}")
+        pyfiglet_string = pyfiglet.figlet_format(self.label)
+        lines = [line.rstrip() for line in pyfiglet_string.split('\n')]
+
+        output.extend(lines)
+        lines.pop()
+        lines.pop()
+
+        output.append(f"<T>")
+
+        return '\n'.join(output)
 
 
 
@@ -62,8 +78,6 @@ class Danom(list):
             if block.label == label:
                 return block
         return None
-
-
 
     ## Helper Methods ----------------
     def get_next_available_buid(self) -> str:
@@ -186,8 +200,47 @@ def print_article_header(buid, label):
 # @section CORE_SUBROUTINES
 # @description Subroutines triggered directly by CLI Handlers
 
-
 def parse_danom(path):
+    danom = Danom()  # danom is a list of all the Block Objects (Dicts)
+
+    ## Reading line by line the file parsing the Block Tags
+    with open(path, 'r', encoding='utf-8') as file:
+        inside_block = False
+        inside_header = True
+        content = []
+
+        while True:
+            line = file.readline()
+
+            if line == '':
+                if inside_block:  # If file ends while still in a block, save it
+                    danom.append(Block(label, buid, content))
+                break
+
+            if inside_block == False:
+                block_otag_match = re.search(r'(?<=<B=)([0-9a-zA-Z]+)>([^<\n]+)', line)
+                if block_otag_match:
+                    inside_block = True
+                    inside_header = True
+                    buid = block_otag_match.group(1)
+                    label = block_otag_match.group(2)
+                    content = []
+            else:
+                if inside_header == True:
+                    if re.search(r'^<T>$', line):
+                        inside_header = False
+                else:
+                    if re.search(r'^</B>.*', line):
+                        inside_block = False
+                        danom.append(Block(label, buid, content))   ## Create the Danom Block Object
+                    else :
+                        content.append(line) 
+    return danom
+
+
+
+
+def parse_danom_old(path):
     danom = Danom()  # danom is a list of all the Block Objects (Dicts)
 
     ## Reading line by line the file parsing the Block Tags
@@ -209,24 +262,33 @@ def parse_danom(path):
                 block_otag_match = re.search(r'(?<=<B=)([0-9a-zA-Z]+)>([^<\n]+)', line)
                 if block_otag_match:
                     inside_block = True
+                    inside_header = True
                     buid = block_otag_match.group(1)
                     label = block_otag_match.group(2)
                     content = []  # Reset content for new block
-                    content.append(line) 
+#                    content.append(line) 
 
             ## When inside a Block, program is checking for a Block Closing Tag
             else:
-                ## If found the Closing Tag change inside_block flag
-                if re.search(r'^</B>.*', line):
-                    inside_block = False
-                    content.append(line) 
-                    danom.append(Block(label, buid, content))   ## Create the Danom Block Object
-                    content = []  # Reset content after creating block
+                if inside_header == False:
+                    print('WANG!!')                    ## DEBUGGING
+                    ## If found the Closing Tag change inside_block flag
+                    if re.search(r'^</B>.*', line):
+                        inside_block = False
+                        inside_header = False
+    #                    content.append(line) 
+                        danom.append(Block(label, buid, content))   ## Create the Danom Block Object
+                        content = []  # Reset content after creating block
 
-                else:
+                    else:
                     # Append each line in the content list
-                    content.append(line) 
-
+                        content.append(line) 
+                else:
+                    print('LANG!!')                    ## DEBUGGING
+                    print(f'[DEBUG]: {inside_header=}')                    ## DEBUGGING
+                    if re.search(r'^<T>$', line):
+                        print('BANG!!')                    ## DEBUGGING
+                        inside_header == False
     return danom
 
 
@@ -234,7 +296,8 @@ def is_valid_dan_format(path):
     """Return if the file has proper .dan format"""
     with open(path, 'r', encoding='utf-8') as file:
             line = file.readline()
-            if line == '<B=0>Danotes Header\n':
+            match = re.search(r'^<B=0>.*', line)
+            if match:
                 return True
             return False
 
