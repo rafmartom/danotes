@@ -257,4 +257,11 @@ python3 -c 'from danotes import *; func_return = block_show("test-sample/new-for
 
 danotes block show test-sample/new-format.dano --label 'Table of Contents TOC' --json
 python3 -c 'from danotes import *; func_return = block_show("test-sample/new-format.dano", label="Table of Contents TOC", json=True) ; print(func_return)'
+
+
+danotes block write test-sample/new-format.dano --new-label "Articulo Paco"
+python3 -c 'from danotes import *; func_return = block_write("test-sample/new-format.dano", new_label="Articulo Pepe") ; print(func_return)'
+
+python3 -i -c 'from danotes import *;'
+danom = parse_danom("test-sample/new-format.dano")
 ```

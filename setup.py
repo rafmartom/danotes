@@ -9,7 +9,9 @@ setup(
     license="MIT",
     packages=find_packages(),
     include_package_data=True,
-    install_requires=[],
+    install_requires=[
+        "pyfiglet>=1.0.3"
+        ],
     entry_points={
         "console_scripts": [
             "danotes=danotes.cli:main",

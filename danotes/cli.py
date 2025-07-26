@@ -95,12 +95,11 @@ def main():
     block_write_parser_outputtype.add_argument("--json", help="Output to stdout as Danom Object", action="store_true")
     block_write_parser_outputtype.add_argument("--text", help="Output to stdout as formated dan text", action="store_true")
 
-    block_write_parser_filterby = block_write_parser.add_mutually_exclusive_group(required=True)
-    block_write_parser_filterby.add_argument("-b", "--buid", help="Target Block by buid")
+    block_write_parser.add_argument("-b", "--buid", help="Target Block by buid")
 
 
     block_write_parser.add_argument("-q", "--query", help="Text to Input (If not present defaults to stdin)")
-    block_write_parser.add_argument("-l", "--label", help="Text Label of the New Block Target (for when creating a new block)")
+    block_write_parser.add_argument("-n", "--new-label", help="Text Label of the New Block Target (for when creating a new block)")
 
 
     block_write_parser.add_argument("path", help="Input file")
@@ -111,7 +110,7 @@ def main():
     block_show_parser_outputtype.add_argument("--json", help="Output to stdout as Danom Object", action="store_true")
     block_show_parser_outputtype.add_argument("--text", help="Output to stdout as formated dan text", action="store_true")
 
-    block_show_parser_filterby = block_show_parser.add_mutually_exclusive_group()
+    block_show_parser_filterby : block_show_parser.add_mutually_exclusive_group()
     block_show_parser_filterby.add_argument("-b", "--buid", help="Target Block by buid")
     block_show_parser_filterby.add_argument("-l", "--label", help="Target Block by label (must be unambiguous)")
 
