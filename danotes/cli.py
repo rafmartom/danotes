@@ -1,4 +1,5 @@
 import argparse
+import sys
 from .handlers.block import *
 from .handlers.link import *
 
@@ -10,24 +11,28 @@ from .handlers.link import *
 
 
 def cli_block_write(args):
+    # Handle stdin if no query provided
+    if args.query is None and not sys.stdin.isatty():
+        args.query = sys.stdin.read()
+
     result = block_write(path=args.path, buid=args.buid, query=args.query, new_label=args.new_label, json=args.json, text=args.text)
     if result is not None:
-        print(result)
+        print(result, end='')
 
 def cli_block_show(args):
     result = block_show(path=args.path, buid=args.buid, label=args.label, json=args.json, text=args.text)
     if result is not None:
-        print(result)
+        print(result, end='')
 
 def cli_link_write(args):
     result = link_write(path=args.path, buid=args.buid, uuid=args.uuid, label=args.label, json=args.json, text=args.text)
     if result is not None:
-        print(result)
+        print(result, end='')
 
 def cli_link_show(args):
     result = link_show(path=args.path, buid=args.buid, uuid=args.uuid, label=args.label, json=args.json, text=args.text)
     if result is not None:
-        print(result)
+        print(result, end='')
 
 
 ## EOF EOF EOF TRAMPOLINE_FUNCTIONS 
@@ -110,7 +115,7 @@ def main():
     block_show_parser_outputtype.add_argument("--json", help="Output to stdout as Danom Object", action="store_true")
     block_show_parser_outputtype.add_argument("--text", help="Output to stdout as formated dan text", action="store_true")
 
-    block_show_parser_filterby : block_show_parser.add_mutually_exclusive_group()
+    block_show_parser_filterby = block_show_parser.add_mutually_exclusive_group()
     block_show_parser_filterby.add_argument("-b", "--buid", help="Target Block by buid")
     block_show_parser_filterby.add_argument("-l", "--label", help="Target Block by label (must be unambiguous)")
 

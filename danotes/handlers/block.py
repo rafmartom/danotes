@@ -1,6 +1,6 @@
 from ..model.core import *
 
-def block_write(path, buid=None, query=None, new_label=None, json=False, text=False):
+def block_write(path, buid=None, query=None, new_label="Unnamed Article", json=False, text=False):
     """Write a determined Dan Block Object. 
     If not target Block given write on next <buid>.
     If target Block already exists will append text to it
@@ -13,26 +13,31 @@ def block_write(path, buid=None, query=None, new_label=None, json=False, text=Fa
 
     danom = parse_danom(path)
 
-    ## Assign next buid if not given
-    if not buid:
-        buid = get_next_available_buid(danom)
-        if not new_label:
-            new_label = "Unnamed Article"
-        create_new_block(danom, buid, new_label) 
-        write_danom(danom,path)
-        return buid
-        
-    else:
-        if not get_block_by_buid(danom, buid):
+
+    ## Getting the block
+    if buid:
+        ## Block needs to exist
+        if danom.get_block_by_buid(buid):
+            block = danom.get_block_by_buid(buid)
+        else:
             raise ValueError(f"{buid=} does not exists within the file. What Block do you want to append text to?")
+    ## If there is not buid create a new one
+    else:
+        buid = danom.get_next_available_buid()
+        block = danom.create_new_block(buid, new_label)
 
-        
+    ## If there is query append to the block
+    if query:
+        block.append_query(query)
 
-              #    if text:
-              #        print(block.get_content())
-              #        return
-              #    else:
-              #        print(block.to_json())
+    # Outputting info in the desired format
+    if json:
+        return block.to_json()
+    elif text:
+        return block.to_text()
+    else:
+        return block.buid
+
 
 
 
@@ -49,50 +54,28 @@ def block_show(path, buid=None, label=None, json=False, text=False):
     danom = parse_danom(path)
 
 
-    if not label and not buid:
-        if json:
-            return danom_to_json(danom)
-        elif text:
-            return render_danom(danom)
-        else:
-            return 
-    if label:
-        block = get_block_by_label(danom, label)
-    else:
-        block = get_block_by_buid(danom, buid)
+    ## Selecting target by block or whole danom
+    match (buid, label):
+        case (None, None):
+            target = danom
+        case (buid, None) if buid is not None:  # Check buid is not None
+            if danom.get_block_by_buid(buid):
+                target = danom.get_block_by_buid(buid)
+            else:
+                raise ValueError(f"{buid=} does not exist.")
+        case (None, label) if label is not None:  # Check label is not None
+            if danom.get_block_by_label(label):
+                target = danom.get_block_by_label(label)
+            else:
+                raise ValueError(f"{label=} does not exist.")
+        case _:
+            raise ValueError("Cannot specify both buid and label.")
+            target = danom
+
+    # Outputting info in the desired format
     if json:
-        return block.to_json()
+        return target.to_json()
     elif text:
-        return block.get_content()
+        return target.to_text()
     else:
-        return 
-
-
-
-
-
-
-#    block_update(path, buid, label, json, text)
-#
-#    match (buid, label, json, text):
-#        case (None, None, _, _):
-#            block_update_all()
-#        case (None, None, True, False):
-#            block_show_all(json=True)
-#        case (None, None, False, True):
-#            block_show_all(text=True)
-#        case (buid, None, _, _):
-#            block_update(buid)
-#        case (None, None, True, False):
-#            block_show_all(json=True)
-#        case (None, None, False, True):
-#            block_show_all(text=True)
-#
-#        case (buid, None, _, _):
-#        case _:
-#            raise ValueError("Unexpected parameters received")
-#    if buid:
-#
-#        block_
-#    elif not buid:
-#    else:
+        return f"{path} danom has been successfully updated.\n"

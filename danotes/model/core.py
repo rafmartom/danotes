@@ -31,15 +31,27 @@ class Block(DanObject):
             'content': self.content  # Already a list (JSON-compatible)
         }
 
+    ## Modification methods -----------
+    def append_query(self, query: str):
+        """Append Query to the Block's Content"""
+        content = query.splitlines()
+#        print(content)
+        self.content.extend(content)
+        return self
+
+
     ## Output methods -----------------
     def to_json(self, indent: int = 2) -> str:
         """Serialize the Block to a JSON string."""
         return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)
     def get_content(self) -> str:
         """Get the Content of the Block as it is"""
-        return ''.join(self.content)
+        return '\n'.join(self.content)
+#        print(self.content[0])
+#        print(self.content)
+#        return 'pepe'
 
-    def render_content(self) -> str:
+    def to_text(self) -> str:
         """Get the Content of the Block with a horizontal line <hr> at the end"""
         content_str = self.get_header()
         content_str = content_str + self.get_content()
@@ -58,6 +70,7 @@ class Block(DanObject):
         lines.pop()
 
         output.append(f"<T>")
+        output.append("\n")
 
         return '\n'.join(output)
 
@@ -85,10 +98,11 @@ class Danom(list):
         return get_next_uid(self[-1].buid)
 
     ## Modification methods -----------
-    def create_new_block(sef, buid: str, new_label: str="Unnamed Article"):
+    def create_new_block(self, buid: str, new_label: str="Unnamed Article"):
         """Create a new Block on a given Danom"""
-        content = print_article_header(buid, new_label)
-        self.append(Block(new_label, buid, content))
+        new_block = Block(new_label, buid, [])
+        self.append(new_block)
+        return new_block
 
     def write_to_block(self, buid: str, query: str):
         """Write some query into a determined block of a given Danom"""
@@ -101,11 +115,11 @@ class Danom(list):
         """Convert the Danom to a JSON string."""
         return json.dumps([block.to_dict() for block in self], indent=indent, ensure_ascii=False)
 
-    def render_content(self) -> str:
+    def to_text(self) -> str:
         """Convert the Danom to a text string.Note: <hr> horizontal separators will be added"""
         output = []
         for block in self:
-            output.append(block.render_content())
+            output.append(block.to_text())
         return ''.join(output)    
 
     def get_content(self) -> str:
@@ -115,10 +129,9 @@ class Danom(list):
             output.append(block.get_content())
         return ''.join(output)    
 
-
-    def save_text(self, path):
+    def to_file(self, path):
         """Save the Danom rendered text to a file"""
-        text = self.render()
+        text = self.to_text()
         with open(path, 'w', encoding='utf-8') as file:
             file.write(text) 
 
@@ -186,7 +199,6 @@ def print_article_header(buid, label):
     output.append(f"</B><L=1>To Main TOC</L> | <L={buid}>Back to Article Top</L>")
 
 
-#    return output
     return '\n'.join(output)
 
 
@@ -234,62 +246,11 @@ def parse_danom(path):
                         inside_block = False
                         danom.append(Block(label, buid, content))   ## Create the Danom Block Object
                     else :
-                        content.append(line) 
+                        content.append(line.rstrip('\n')) 
     return danom
 
 
 
-
-def parse_danom_old(path):
-    danom = Danom()  # danom is a list of all the Block Objects (Dicts)
-
-    ## Reading line by line the file parsing the Block Tags
-    with open(path, 'r', encoding='utf-8') as file:
-        inside_block = False
-        content = []
-
-        while True:
-            line = file.readline()
-
-            ## Exit condition if found no more data in the file exit the loop
-            if line == '':
-                if inside_block:  # If file ends while still in a block, save it
-                    danom.append(Block(label, buid, content))
-                break
-
-            ## Begin by matching an Block Opening Tag parsing its <buid> and <label>
-            if inside_block == False:
-                block_otag_match = re.search(r'(?<=<B=)([0-9a-zA-Z]+)>([^<\n]+)', line)
-                if block_otag_match:
-                    inside_block = True
-                    inside_header = True
-                    buid = block_otag_match.group(1)
-                    label = block_otag_match.group(2)
-                    content = []  # Reset content for new block
-#                    content.append(line) 
-
-            ## When inside a Block, program is checking for a Block Closing Tag
-            else:
-                if inside_header == False:
-                    print('WANG!!')                    ## DEBUGGING
-                    ## If found the Closing Tag change inside_block flag
-                    if re.search(r'^</B>.*', line):
-                        inside_block = False
-                        inside_header = False
-    #                    content.append(line) 
-                        danom.append(Block(label, buid, content))   ## Create the Danom Block Object
-                        content = []  # Reset content after creating block
-
-                    else:
-                    # Append each line in the content list
-                        content.append(line) 
-                else:
-                    print('LANG!!')                    ## DEBUGGING
-                    print(f'[DEBUG]: {inside_header=}')                    ## DEBUGGING
-                    if re.search(r'^<T>$', line):
-                        print('BANG!!')                    ## DEBUGGING
-                        inside_header == False
-    return danom
 
 
 def is_valid_dan_format(path):
@@ -303,42 +264,9 @@ def is_valid_dan_format(path):
 
      
 
-#def create_new_article(label):
-#    """Create a new Article Object on the Next Available <buid>"""
-#    Article()
-
-
-#def block_show_json_all(path)
-#    """Show all the Dan Blocks in a Given file output it in JSON"""
-    
-
-
-#def append_text_to_block(...):
-
-
-#def get_block_by_buid(...):
-
-
 
 ## EOF EOF EOF CORE_SUBROUTINES 
 ## ----------------------------------------------------------------------------
 
 
-
-
-
-# Example usage
-#link_one = LinkTarget('To Patxie', '0')
-#link_two = LinkTarget('To Peps', '1')
-#
-#article_one = Article('My Article', '2', 'Wallazopa come on <I=2#0>To Patxie</I><I=2#1>To Peps</I>', None, [link_one, link_two])
-#
-#print(article_one)
-#print(article_one.inlines)
-#print(article_one.inlines[0])
-#print(article_one.inlines[0].label)
-#print(article_one.buid)
-#print(article_one.inlines[0].iid)
-
 __all__ = [ 'DanObject', 'Block', 'Danom', 'parse_danom', 'is_valid_dan_format' ]
-#__all__ = ['DanObject', 'Block', 'Header', 'GeneralToc', 'Article', 'Inline', 'LinkTarget']

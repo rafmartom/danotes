@@ -252,7 +252,7 @@ python3 -c 'from danotes import *; func_return = block_show("test-sample/new-for
 danotes block show test-sample/new-format.dano --json
 python3 -c 'from danotes import *; func_return = block_show("test-sample/new-format.dano", json=True) ; print(func_return)'
 
-danotes block show test-sample/new-format.dano --label 'Table of Contents TOC' --text
+danotes block show test-sample/new-format.dano --label 'Document TOC' --text
 python3 -c 'from danotes import *; func_return = block_show("test-sample/new-format.dano", label="Table of Contents TOC", text=True) ; print(func_return)'
 
 danotes block show test-sample/new-format.dano --label 'Table of Contents TOC' --json
@@ -262,6 +262,27 @@ python3 -c 'from danotes import *; func_return = block_show("test-sample/new-for
 danotes block write test-sample/new-format.dano --new-label "Articulo Paco"
 python3 -c 'from danotes import *; func_return = block_write("test-sample/new-format.dano", new_label="Articulo Pepe") ; print(func_return)'
 
-python3 -i -c 'from danotes import *;'
-danom = parse_danom("test-sample/new-format.dano")
+
+## Create an Unnamed new Block
+danotes block write test-sample/new-format.dano
+
+## Append no text to buid='2' (doesnt have much sense)
+danotes block write test-sample/new-format.dano --buid 2 --text
+
+## Append a query to buid='2'
+danotes block write test-sample/new-format.dano --buid 2 --query "Some one-liner" --text
+
+## Append a multiline stdin query to buid='2' 
+echo -e "Mai\nMultiline\nTrods" | danotes block write test-sample/new-format.dano --buid 2 --text
+
+## Create a new Block, appending a multiline stdin query
+echo -e "Mai\nMultiline\nTrods" | danotes block write test-sample/new-format.dano --new-label 'Mai Article' --text
+
+
+## Debugging interactively
+python3 -i -c 'from danotes import *'
+
+
+## Local Debugging
+gitToTermbin -x "*README.md" -x "*test-sample*"
 ```
