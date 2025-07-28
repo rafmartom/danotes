@@ -19,6 +19,8 @@ def block_write(path, buid=None, query=None, new_label="Unnamed Article", json=F
         ## Block needs to exist
         if danom.get_block_by_buid(buid):
             block = danom.get_block_by_buid(buid)
+        elif buid == '0' or buid == '1':
+            raise ValueError(f"{buid=} 0 or 1 cannot be modified")
         else:
             raise ValueError(f"{buid=} does not exists within the file. What Block do you want to append text to?")
     ## If there is not buid create a new one

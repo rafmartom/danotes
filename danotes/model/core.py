@@ -1,6 +1,7 @@
 import re
 import json
 import pyfiglet
+from pathlib import Path
 
 ## ----------------------------------------------------------------------------
 # @section OBJECT_MODEL_DEFINITIONS(DANOM)
@@ -35,7 +36,6 @@ class Block(DanObject):
     def append_query(self, query: str):
         """Append Query to the Block's Content"""
         content = query.splitlines()
-#        print(content)
         self.content.extend(content)
         return self
 
@@ -47,9 +47,6 @@ class Block(DanObject):
     def get_content(self) -> str:
         """Get the Content of the Block as it is"""
         return '\n'.join(self.content)
-#        print(self.content[0])
-#        print(self.content)
-#        return 'pepe'
 
     def to_text(self) -> str:
         """Get the Content of the Block with a horizontal line <hr> at the end"""
@@ -73,7 +70,6 @@ class Block(DanObject):
         output.append("\n")
 
         return '\n'.join(output)
-
 
 
 class Danom(list):
@@ -109,6 +105,50 @@ class Danom(list):
         block = self.get_block_by_buid(buid)
         if block:
             block.content.append(query)
+
+    def create_new_header_block(self, path: str):
+        """Create a new header block"""
+        basename_no_ext = Path(path).stem  
+        ## Creating that special new block buid 0
+        new_block = self.create_new_block("0", basename_no_ext)
+
+        pyfiglet_string = pyfiglet.figlet_format("danotes", font="univers")
+
+        lines = [line.rstrip() for line in pyfiglet_string.split('\n')]
+        lines.pop()
+        lines.pop()
+
+        new_block.content.extend(lines)
+        new_block.content.append("")
+        new_block.content.append("The following lines are used by danotes, modify them only if you know !")
+        new_block.content.append("")
+        new_block.content.append('dan_ext_list: []')
+        new_block.content.append('dan_kw_question_list: []')
+        new_block.content.append('dan_kw_nontext_list: []')
+        new_block.content.append('dan_kw_linenr_list: []')
+        new_block.content.append('dan_kw_warningmsg_list: []')
+        new_block.content.append('dan_kw_colorcolumn_list: []')
+        new_block.content.append('dan_kw_underlined_list: []')
+        new_block.content.append('dan_kw_preproc_list: []')
+        new_block.content.append('dan_kw_comment_list: []')
+        new_block.content.append('dan_kw_identifier_list: []')
+        new_block.content.append('dan_kw_ignore_list: []')
+        new_block.content.append('dan_kw_statement_list: []')
+        new_block.content.append('dan_kw_cursorline_list: []')
+        new_block.content.append('dan_kw_tabline_list: []')
+        new_block.content.append('dan_wrap_lines: 105')
+        new_block.content.append('dan_indexed_from:')
+        new_block.content.append('dan_parsed_on:')
+        new_block.content.append('dan_title: "{basename_no_ext}"')
+        new_block.content.append('dan_description:')
+        new_block.content.append('dan_tags: []')
+        new_block.content.append('')
+
+        return new_block
+
+    def create_new_toc_block(self):
+        new_block = self.create_new_block("1", "Document TOC")
+        return 
 
     ## Output methods -----------------
     def to_json(self, indent: int = 2) -> str:
@@ -188,8 +228,8 @@ def print_article_header(buid, label):
 
     lines = [line.rstrip() for line in pyfiglet_string.split('\n')]
     output.extend(lines)
-    lines.pop()
-    lines.pop()
+#    lines.pop()
+#    lines.pop()
 
     output.append(f"<T>")
 
@@ -201,6 +241,43 @@ def print_article_header(buid, label):
 
     return '\n'.join(output)
 
+
+def create_new_header_block(path):
+    content = []
+
+    pyfiglet_string = pyfiglet.figlet_format("danotes", font="univers")
+
+    lines = [line.rstrip() for line in pyfiglet_string.split('\n')]
+    content.extend(lines)
+
+    content.append("")
+    content.append("The following lines are used by danotes, modify them only if you know !")
+    content.append("")
+
+    content.append('dan_ext_list: ["javascript"]')
+    content.append('dan_kw_question_list: ["^Description"]')
+    content.append('dan_kw_nontext_list: ["^Parameters", "^Type"]')
+    content.append('dan_kw_linenr_list: ["^Parameter "]')
+    content.append('dan_kw_warningmsg_list: ["^Returns"]')
+    content.append('dan_kw_colorcolumn_list: []')
+    content.append('dan_kw_underlined_list: []')
+    content.append('dan_kw_preproc_list: []')
+    content.append('dan_kw_comment_list: []')
+    content.append('dan_kw_identifier_list: []')
+    content.append('dan_kw_ignore_list: []')
+    content.append('dan_kw_statement_list: []')
+    content.append('dan_kw_cursorline_list: []')
+    content.append('dan_kw_tabline_list: []')
+    content.append('dan_wrap_lines: 105')
+    content.append('dan_indexed_from:')
+    content.append('dan_parsed_on:')
+    content.append('dan_title: "adobe-ppro"')
+    content.append('dan_description:')
+    content.append('dan_tags: []')
+    content.append('')
+
+
+#def create_new_document_toc():
 
 
 ## EOF EOF EOF HELPERS 

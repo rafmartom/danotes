@@ -279,8 +279,15 @@ echo -e "Mai\nMultiline\nTrods" | danotes block write test-sample/new-format.dan
 echo -e "Mai\nMultiline\nTrods" | danotes block write test-sample/new-format.dano --new-label 'Mai Article' --text
 
 
+## Create the Header and TOC block
+danotes file new test-sample/new-file.dano --text
+danotes file new test-sample/new-file.dano --json
+
+
 ## Debugging interactively
 python3 -i -c 'from danotes import *'
+danom = Danom()
+danom.create_new_header_block('test-sample/new-file.dano')
 
 
 ## Local Debugging

@@ -2,6 +2,7 @@ import argparse
 import sys
 from .handlers.block import *
 from .handlers.link import *
+from .handlers.file import *
 
 
 ## ----------------------------------------------------------------------------
@@ -9,6 +10,10 @@ from .handlers.link import *
 # @description This functions are defined so the CLI Prints out the return 
 #   statement of the library functions
 
+def cli_file_new(args):
+    result = file_new(path=args.path, json=args.json, text=args.text)
+    if result is not None:
+        print(result, end='')
 
 def cli_block_write(args):
     # Handle stdin if no query provided
@@ -83,6 +88,25 @@ def main():
     ## ----------------------------------------------------------------------------
 
 
+    ## ----------------------------------------------------------------------------
+    # @section FILE
+    # @description Description
+
+    file_parser = subparsers.add_parser("file", help="Dan file Operations")
+    file_subparsers = file_parser.add_subparsers(dest="subcommand", required=True)
+
+
+    # file new
+    file_new_parser = file_subparsers.add_parser("new", help=file_new.__doc__, description=file_new.__doc__)
+    file_new_parser.add_argument("path", help="Input file")
+
+    file_new_parser_outputtype = file_new_parser.add_mutually_exclusive_group()
+    file_new_parser_outputtype.add_argument("--json", help="Output to stdout as Danom Object", action="store_true")
+    file_new_parser_outputtype.add_argument("--text", help="Output to stdout as formated dan text", action="store_true")
+
+
+    ## EOF EOF EOF FILE 
+    ## ----------------------------------------------------------------------------
 
 
 
@@ -177,6 +201,10 @@ def main():
     # @section PARSE_AND_DISPATCH
 
     args = parser.parse_args()
+
+    if args.command == "file":
+        if args.subcommand == "new":
+            cli_file_new(args)
 
     if args.command == "block":
         if args.subcommand == "write":

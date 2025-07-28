@@ -1,3 +1,5 @@
+from ..model.core import *
+
 def link_write(path, buid, uuid, label, json=False, text=True):
     """Write a determined Dan Link Object"""
     print(f"Writing {json=} {text=} {buid=} {uuid=} {label=} {path=}")
