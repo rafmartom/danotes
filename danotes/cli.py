@@ -15,12 +15,29 @@ def cli_file_new(args):
     if result is not None:
         print(result, end='')
 
+def cli_file_append(args):
+    # Handle stdin if no query provided
+    if args.query is None and not sys.stdin.isatty():
+        args.query = sys.stdin.read()
+
+    # Check if query is still None or empty/whitespace
+    if not args.query or args.query.strip() == "":
+        print("Error: Not valid parameters or insufficient parameters.", file=sys.stderr)
+        sys.exit(1)
+
+    result = file_append(path=args.path, query=args.query)
+    if result is not None:
+        print(result, end='')
+
 def cli_block_write(args):
     # Handle stdin if no query provided
     if args.query is None and not sys.stdin.isatty():
         args.query = sys.stdin.read()
 
-    result = block_write(path=args.path, buid=args.buid, query=args.query, new_label=args.new_label, json=args.json, text=args.text)
+    # Use default "Unnamed Article" if new_label is None
+    new_label = args.new_label if args.new_label is not None else "Unnamed Article"
+
+    result = block_write(path=args.path, buid=args.buid, query=args.query, new_label=new_label, json=args.json, text=args.text)
     if result is not None:
         print(result, end='')
 
@@ -104,6 +121,12 @@ def main():
     file_new_parser_outputtype.add_argument("--json", help="Output to stdout as Danom Object", action="store_true")
     file_new_parser_outputtype.add_argument("--text", help="Output to stdout as formated dan text", action="store_true")
 
+
+    # file append
+    file_append_parser = file_subparsers.add_parser("append", help=file_append.__doc__, description=file_append.__doc__)
+    file_append_parser.add_argument("path", help="Input file")
+
+    file_append_parser.add_argument("-q", "--query", help="Text to Input (If not present defaults to stdin)")
 
     ## EOF EOF EOF FILE 
     ## ----------------------------------------------------------------------------
@@ -205,6 +228,9 @@ def main():
     if args.command == "file":
         if args.subcommand == "new":
             cli_file_new(args)
+        if args.subcommand == "append":
+            cli_file_append(args)
+
 
     if args.command == "block":
         if args.subcommand == "write":

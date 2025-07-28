@@ -2,7 +2,7 @@ from .handlers.block import *
 from .handlers.link import *
 from .handlers.file import *
 
-__all__ = ['file_new', 'block_write', 'block_show', 'link_write', 'link_show']
+__all__ = ['file_new', 'file_append', 'block_write', 'block_show', 'link_write', 'link_show']
 
 ## Momentary snippet for working directly with the danom interactively          ## DEBUGGING
 

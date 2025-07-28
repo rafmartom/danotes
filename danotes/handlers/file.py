@@ -19,3 +19,7 @@ def file_new(path, json=False, text=True):
         danom.to_file(path)
         return f"File {path} has been successfully created.\n"
   
+def file_append(path, query):
+    """Append text to a .dan formated file without parsing the Danom (dumber but faster on huge files)"""
+    append_after_third_last_line(path, query)
+

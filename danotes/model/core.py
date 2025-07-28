@@ -2,6 +2,7 @@ import re
 import json
 import pyfiglet
 from pathlib import Path
+import os
 
 ## ----------------------------------------------------------------------------
 # @section OBJECT_MODEL_DEFINITIONS(DANOM)
@@ -66,8 +67,7 @@ class Block(DanObject):
         lines.pop()
         lines.pop()
 
-        output.append(f"<T>")
-        output.append("\n")
+        output.append(f"<T>\n")
 
         return '\n'.join(output)
 
@@ -277,7 +277,7 @@ def create_new_header_block(path):
     content.append('')
 
 
-#def create_new_document_toc():
+
 
 
 ## EOF EOF EOF HELPERS 
@@ -340,10 +340,42 @@ def is_valid_dan_format(path):
             return False
 
      
+def append_after_third_last_line(file_path, string_to_append, estimated_max_line_length=200):
+    # Open in binary mode to work with byte offsets
+    with open(file_path, 'rb') as f:
+        f.seek(0, os.SEEK_END)
+        file_size = f.tell()
+
+        # Seek to a reasonable chunk near the end
+        seek_back = min(file_size, estimated_max_line_length * 4)
+        f.seek(-seek_back, os.SEEK_END)
+        tail = f.read()
+
+        # Find the positions of the last 3 newlines
+        newline_indices = [i for i, b in enumerate(tail) if b == ord(b'\n')]
+        if len(newline_indices) < 3:
+            # Not enough lines to skip 3 — append at the end
+            insert_pos = file_size
+        else:
+            insert_pos = file_size - seek_back + newline_indices[-3] + 1
+
+    # Now rewrite the file up to insert_pos, then add your content, then the rest
+    with open(file_path, 'rb') as f:
+        original = f.read()
+
+    new_content = (
+        original[:insert_pos] +
+        string_to_append.encode() +
+        (b'' if string_to_append.endswith('\n') else b'\n') +
+        original[insert_pos:]
+    )
+
+    with open(file_path, 'wb') as f:
+        f.write(new_content)
 
 
 ## EOF EOF EOF CORE_SUBROUTINES 
 ## ----------------------------------------------------------------------------
 
 
-__all__ = [ 'DanObject', 'Block', 'Danom', 'parse_danom', 'is_valid_dan_format' ]
+__all__ = [ 'DanObject', 'Block', 'Danom', 'parse_danom', 'is_valid_dan_format' , 'append_after_third_last_line' ]

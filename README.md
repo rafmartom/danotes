@@ -279,6 +279,10 @@ echo -e "Mai\nMultiline\nTrods" | danotes block write test-sample/new-format.dan
 echo -e "Mai\nMultiline\nTrods" | danotes block write test-sample/new-format.dano --new-label 'Mai Article' --text
 
 
+## Append to .dan file in a dumb way (not parsing danom) (will append to last block)
+echo -e "Mai\nMultiline\nTrods" | danotes file append test-sample/new-format.dano
+
+
 ## Create the Header and TOC block
 danotes file new test-sample/new-file.dano --text
 danotes file new test-sample/new-file.dano --json

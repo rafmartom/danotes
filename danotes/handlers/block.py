@@ -1,8 +1,9 @@
 from ..model.core import *
 
-def block_write(path, buid=None, query=None, new_label="Unnamed Article", json=False, text=False):
+def block_write(path, buid=None, query=None, new_label=None, json=False, text=False):
     """Write a determined Dan Block Object. 
-    If not target Block given write on next <buid>.
+    If --new-label , it will create a New Block on the next available <buid>.
+    If not --new-label , but --query , it will append on the last block
     If target Block already exists will append text to it
     If target Block doesnt exist give an error
     """
@@ -24,9 +25,12 @@ def block_write(path, buid=None, query=None, new_label="Unnamed Article", json=F
         else:
             raise ValueError(f"{buid=} does not exists within the file. What Block do you want to append text to?")
     ## If there is not buid create a new one
-    else:
+    elif not query:
         buid = danom.get_next_available_buid()
         block = danom.create_new_block(buid, new_label)
+    ## If there is query but not buid get the last block
+    else :
+        block = danom[-1]
 
     ## If there is query append to the block
     if query:
@@ -38,6 +42,7 @@ def block_write(path, buid=None, query=None, new_label="Unnamed Article", json=F
     elif text:
         return block.to_text()
     else:
+        danom.to_file(path)
         return block.buid
 
 
@@ -80,4 +85,5 @@ def block_show(path, buid=None, label=None, json=False, text=False):
     elif text:
         return target.to_text()
     else:
+        danom.to_file(path)
         return f"{path} danom has been successfully updated.\n"
