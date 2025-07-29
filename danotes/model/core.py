@@ -3,23 +3,45 @@ import json
 import pyfiglet
 from pathlib import Path
 import os
+from typing import Self
 
 ## ----------------------------------------------------------------------------
 # @section OBJECT_MODEL_DEFINITIONS(DANOM)
 
 
-class DanObject:
-    """Base class for all DAN objects."""
-    def __init__(self, label: str):
-        self.label = label
+class Header:
+    """Manages the header of a Block, from <B={buid}>{label} to <T>."""
+    def __init__(self, block: 'Block'):
+        self.block = block
 
-class Block(DanObject):
+    def to_string(self) -> str:
+        """Get the Header of a Block as a contiguous string using Block's buid and label."""
+        output = []
+        output.append(f"<B={self.block.buid}>{self.block.label}")
+        pyfiglet_string = pyfiglet.figlet_format(self.block.label)
+        lines = [line.rstrip() for line in pyfiglet_string.split('\n')]
+        output.extend(lines)
+        # Remove the last two lines of pyfiglet output (empty or decorative)
+        if len(lines) > 2:
+            lines.pop()
+            lines.pop()
+        output.append("<T>\n")
+        return '\n'.join(output)
+
+class Content(list):
+    """List of the lines containing the content of a Block."""
+    def to_string(self) -> str:
+        """Get the Content as a contiguous string."""
+        return '\n'.join(self)
+
+class Block():
     """DAN Block Elements that get printed out and displayed, they contain the Inline elements"""
     ## Core methods -------------------
-    def __init__(self, label: str, buid: str, content: list):
-        super().__init__(label)
+    def __init__(self, label: str, buid: str, content: Content):
         self.buid = buid
+        self.label = label
         self.content = content
+        self.header = Header(self)
     def __repr__(self):
         content_preview = ', '.join([repr(line.strip()) for line in self.content[:3]])
         if len(self.content) > 3:
@@ -33,6 +55,7 @@ class Block(DanObject):
             'content': self.content  # Already a list (JSON-compatible)
         }
 
+
     ## Modification methods -----------
     def append_query(self, query: str):
         """Append Query to the Block's Content"""
@@ -45,37 +68,60 @@ class Block(DanObject):
     def to_json(self, indent: int = 2) -> str:
         """Serialize the Block to a JSON string."""
         return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)
-    def get_content(self) -> str:
-        """Get the Content of the Block as it is"""
-        return '\n'.join(self.content)
+
+    def to_string(self) -> str:
+        output = self.header.to_string()
+        output = output + self.content.to_string()
+        return output
 
     def to_text(self) -> str:
         """Get the Content of the Block with a horizontal line <hr> at the end"""
-        content_str = self.get_header()
-        content_str = content_str + self.get_content()
-        content_str = content_str + f'\n</B><L=1>To Document TOC</L> | <L={self.buid}>Back to Article Top</L>\n'
-        return content_str + ('=' * 105) + "\n"
+        output = self.to_string()
+        output = output + f'\n</B><L=1>To Document TOC</L> | <L={self.buid}>Back to Article Top</L>\n'
+        return output + ('=' * 105) + "\n"
 
-    def get_header(self) -> str:
-        output = []
-
-        output.append(f"<B={self.buid}>{self.label}")
-        pyfiglet_string = pyfiglet.figlet_format(self.label)
-        lines = [line.rstrip() for line in pyfiglet_string.split('\n')]
-
-        output.extend(lines)
-        lines.pop()
-        lines.pop()
-
-        output.append(f"<T>\n")
-
-        return '\n'.join(output)
 
 
 class Danom(list):
     """The Root Object for the Object Model of a .dan file DAN ObjectModel"""
 
     ## Getter Methods -----------------
+    def load(self, path) -> Self:
+        ## Reading line by line the file parsing the Block Tags
+        with open(path, 'r', encoding='utf-8') as file:
+            inside_block = False
+            inside_header = True
+            content = Content()
+
+            while True:
+                line = file.readline()
+
+                if line == '':
+                    if inside_block:  # If file ends while still in a block, save it
+                        self.append(Block(label, buid, content))
+                    break
+
+                if inside_block == False:
+                    block_otag_match = re.search(r'(?<=<B=)([0-9a-zA-Z]+)>([^<\n]+)', line)
+                    if block_otag_match:
+                        inside_block = True
+                        inside_header = True
+                        buid = block_otag_match.group(1)
+                        label = block_otag_match.group(2)
+                        content = Content()
+                else:
+                    if inside_header == True:
+                        if re.search(r'^<T>$', line):
+                            inside_header = False
+                    else:
+                        if re.search(r'^</B>.*', line):
+                            inside_block = False
+                            self.append(Block(label, buid, content))   ## Create the Danom Block Object
+                        else :
+                            content.append(line.rstrip('\n')) 
+        return self
+
+
     def get_block_by_buid(self, buid: str) -> Block | None:
         for block in self:
             if block.buid == buid:
@@ -162,19 +208,11 @@ class Danom(list):
             output.append(block.to_text())
         return ''.join(output)    
 
-    def get_content(self) -> str:
-        """Convert the Danom to a text string.Without <hr>"""
-        output = []
-        for block in self:
-            output.append(block.get_content())
-        return ''.join(output)    
-
     def to_file(self, path):
         """Save the Danom rendered text to a file"""
         text = self.to_text()
         with open(path, 'w', encoding='utf-8') as file:
             file.write(text) 
-
 
 
 ## EOF EOF EOF OBJECT_MODEL_DEFINITIONS(DANOM) 
@@ -218,28 +256,6 @@ def get_next_uid(uid):
         next_uid.append(alphanumeric[remainder])
 
     return ''.join(reversed(next_uid))
-
-
-def print_article_header(buid, label):
-    output = []
-
-    output.append(f"<B={buid}>{label}")
-    pyfiglet_string = pyfiglet.figlet_format(label)
-
-    lines = [line.rstrip() for line in pyfiglet_string.split('\n')]
-    output.extend(lines)
-#    lines.pop()
-#    lines.pop()
-
-    output.append(f"<T>")
-
-    output.append(f"")
-    output.append(f"")
-
-    output.append(f"</B><L=1>To Main TOC</L> | <L={buid}>Back to Article Top</L>")
-
-
-    return '\n'.join(output)
 
 
 def create_new_header_block(path):
@@ -288,45 +304,6 @@ def create_new_header_block(path):
 ## ----------------------------------------------------------------------------
 # @section CORE_SUBROUTINES
 # @description Subroutines triggered directly by CLI Handlers
-
-def parse_danom(path):
-    danom = Danom()  # danom is a list of all the Block Objects (Dicts)
-
-    ## Reading line by line the file parsing the Block Tags
-    with open(path, 'r', encoding='utf-8') as file:
-        inside_block = False
-        inside_header = True
-        content = []
-
-        while True:
-            line = file.readline()
-
-            if line == '':
-                if inside_block:  # If file ends while still in a block, save it
-                    danom.append(Block(label, buid, content))
-                break
-
-            if inside_block == False:
-                block_otag_match = re.search(r'(?<=<B=)([0-9a-zA-Z]+)>([^<\n]+)', line)
-                if block_otag_match:
-                    inside_block = True
-                    inside_header = True
-                    buid = block_otag_match.group(1)
-                    label = block_otag_match.group(2)
-                    content = []
-            else:
-                if inside_header == True:
-                    if re.search(r'^<T>$', line):
-                        inside_header = False
-                else:
-                    if re.search(r'^</B>.*', line):
-                        inside_block = False
-                        danom.append(Block(label, buid, content))   ## Create the Danom Block Object
-                    else :
-                        content.append(line.rstrip('\n')) 
-    return danom
-
-
 
 
 
@@ -378,4 +355,4 @@ def append_after_third_last_line(file_path, string_to_append, estimated_max_line
 ## ----------------------------------------------------------------------------
 
 
-__all__ = [ 'DanObject', 'Block', 'Danom', 'parse_danom', 'is_valid_dan_format' , 'append_after_third_last_line' ]
+__all__ = [ 'Block', 'Danom', 'Content', 'Header', 'is_valid_dan_format' , 'append_after_third_last_line' ]

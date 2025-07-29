@@ -12,7 +12,8 @@ def block_write(path, buid=None, query=None, new_label=None, json=False, text=Fa
     if not is_valid_dan_format(path):
         raise ValueError(f"{path} Invalid file type. Expected .dan syntax within. If the path is correct you may want to fix it")
 
-    danom = parse_danom(path)
+    danom = Danom()
+    danom.load(path)
 
 
     ## Getting the block
@@ -58,7 +59,8 @@ def block_show(path, buid=None, label=None, json=False, text=False):
     if not is_valid_dan_format(path):
         raise ValueError(f"{path} Invalid file type. Expected .dan syntax within. If the path is correct you may want to fix it")
 
-    danom = parse_danom(path)
+    danom = Danom(path)
+    danom.load(path)
 
 
     ## Selecting target by block or whole danom

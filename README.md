@@ -291,6 +291,8 @@ danotes file new test-sample/new-file.dano --json
 ## Debugging interactively
 python3 -i -c 'from danotes import *'
 danom = Danom()
+danom.load('test-sample/new-file.dano')
+
 danom.create_new_header_block('test-sample/new-file.dano')
 
 
