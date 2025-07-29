@@ -47,7 +47,10 @@ def cli_block_show(args):
         print(result, end='')
 
 def cli_link_write(args):
-    result = link_write(path=args.path, buid=args.buid, uuid=args.uuid, label=args.label, json=args.json, text=args.text)
+    # Use default "Unnamed Article" if new_label is None
+    new_label = args.new_label if args.new_label is not None else "NewLink"
+
+    result = link_write(path=args.path, buid=args.buid, uuid=args.uuid, new_label=new_label, json=args.json, text=args.text)
     if result is not None:
         print(result, end='')
 
@@ -188,14 +191,13 @@ def main():
     link_write_parser_outputtype.add_argument("--json", help="Output to stdout as Danom Object", action="store_true")
     link_write_parser_outputtype.add_argument("--text", help="Output to stdout as formated dan text", action="store_true")
 
-    link_write_parser_filterby =  link_write_parser.add_mutually_exclusive_group(required=True)
+    link_write_parser_filterby =  link_write_parser.add_mutually_exclusive_group()
     link_write_parser_filterby.add_argument("-b", "--buid", help="Target Block by buid")
     link_write_parser_filterby.add_argument("-u", "--uuid", help="[Experimental] Select a determined uuid if it does exist it will substitute the previous link")
 
     link_write_parser.add_argument("path", help="File to be modified , if not set would output to stdout")
 
-
-    link_write_parser.add_argument("-l", "--label", help="Text Label of the Link (If not present defaults to stdin)")
+    link_write_parser.add_argument("-n", "--new-label", help="Text Label of the New Link")
 
 
     # link show

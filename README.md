@@ -294,6 +294,9 @@ danotes link show test-sample/new-format.dano --buid 2 --json
 ## Update links target for all the file
 danotes link show test-sample/new-format.dano
 
+## Create a new link
+danotes link write test-sample/new-format.dano --new-label 'My link'
+
 
 
 ## Debugging interactively

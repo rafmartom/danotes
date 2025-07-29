@@ -56,6 +56,11 @@ class LinksTarget(list):
         items = ', '.join(repr(item) for item in self)
         return f"LinksTarget(block={self.block.buid}, items=[{items}])"
 
+    ## Modification methods -----------
+    def new_link(self, new_label: str, iid: str):
+        self.append(LinkTarget(new_label, iid))
+        return self
+
     ## Output methods -----------------
     def to_string(self) -> str:
         output = []
@@ -408,4 +413,4 @@ def append_after_third_last_line(file_path, string_to_append, estimated_max_line
 ## ----------------------------------------------------------------------------
 
 
-__all__ = [ 'Block', 'Danom', 'Content', 'Header', 'LinkTarget', 'LinksTarget', 'is_valid_dan_format' , 'append_after_third_last_line' ]
+__all__ = [ 'Block', 'Danom', 'Content', 'Header', 'LinkTarget', 'LinksTarget', 'is_valid_dan_format' , 'append_after_third_last_line', 'get_next_uid' ]

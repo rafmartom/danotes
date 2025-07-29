@@ -1,8 +1,41 @@
 from ..model.core import *
 
-def link_write(path, buid, uuid, label, json=False, text=True):
+def link_write(path, buid, uuid, new_label=None, json=False, text=True):
     """Write a determined Dan Link Object"""
-    print(f"Writing {json=} {text=} {buid=} {uuid=} {label=} {path=}")
+    print(f"Writing {json=} {text=} {buid=} {uuid=} {new_label=} {path=}")
+
+    danom = Danom()
+    danom = danom.load(path)
+    danom.get_links_target()
+
+    if uuid:
+        # @todo
+        raise ValueError(f"Feature not implemented")
+
+    ## Getting the block
+    if buid:
+        ## Block needs to exist
+        if danom.get_block_by_buid(buid):
+            block = danom.get_block_by_buid(buid)
+        elif buid == '0' or buid == '1':
+            raise ValueError(f"{buid=} 0 or 1 cannot be modified")
+        else:
+            raise ValueError(f"{buid=} does not exists within the file. What Block do you want to append text to?")
+    ## If there is query but not buid get the last block
+    else :
+        block = danom[-1]
+
+    if len(block.links_target):
+        iid = block.links_target[-1].iid
+    else:
+        iid = '1'
+    
+    iid = get_next_uid(iid)
+    block.links_target.new_link(new_label, iid)
+    block.append_query(f"<I={block.buid}#{iid}>{new_label}</I>")
+    danom.to_file(path)
+    return iid
+
 
 def link_show(path, buid, uuid, label, json=False, text=True):
     """For a block show/update the LinkTarget list of that Block
