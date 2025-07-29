@@ -5,7 +5,6 @@
 | (_| | (_| | (_) | |_) |  __/_____| |_) | |_) | | | (_) |
  \__,_|\__,_|\___/|_.__/ \___|     | .__/| .__/|_|  \___/
                                    |_|   |_|
-
 <T>
                                                                            
 
@@ -51,7 +50,6 @@ dan_tags: []
 | |_| | (_) | (__| |_| | | | | | |  __/ | | | |_    | || |_| | |___
 |____/ \___/ \___|\__,_|_| |_| |_|\___|_| |_|\__|   |_| \___/ \____|
 
-
 <T>
 - <L=0>Table of Contents TOC</L>
 - <L=1>First Article</L>
@@ -66,7 +64,9 @@ dan_tags: []
 |  _| | | |  \__ \ |_   / ___ \| |  | |_| | (__| |  __/
 |_|   |_|_|  |___/\__| /_/   \_\_|   \__|_|\___|_|\___|
 
-
+- <L=2#1>Part A</L>
+- <L=2#2>Part B</L>
+- <L=2#3>Part C</L>
 <T>
 
 <I=1#1>Part A</I>
@@ -89,13 +89,18 @@ console.log(myVar)
  ___) |  __/ (_| (_) | | | | (_| |  / ___ \| |  | |_| | (__| |  __/
 |____/ \___|\___\___/|_| |_|\__,_| /_/   \_\_|   \__|_|\___|_|\___|
 
-
+- <L=3#1>Part A</L>
+- <L=3#2>Part B</L>
 <T>
 
 <I=2#1>Part A</I>
 <I=2#2>Part B</I>
 
 
+Patxie
+da
+Peps
+Pepperroni
 </B><L=1>To Document TOC</L> | <L=3>Back to Article Top</L>
 =========================================================================================================
 <B=4>Unnamed Article
@@ -104,7 +109,6 @@ console.log(myVar)
 | | | | '_ \| '_ \ / _` | '_ ` _ \ / _ \/ _` |   / _ \ | '__| __| |/ __| |/ _ \
 | |_| | | | | | | | (_| | | | | | |  __/ (_| |  / ___ \| |  | |_| | (__| |  __/
  \___/|_| |_|_| |_|\__,_|_| |_| |_|\___|\__,_| /_/   \_\_|   \__|_|\___|_|\___|
-
 
 <T>
 
@@ -118,7 +122,6 @@ console.log(myVar)
 | |_| | |  | \__ \
  \___/|_|  |_|___/
 
-
 <T>
 
 </B><L=1>To Document TOC</L> | <L=5>Back to Article Top</L>
@@ -130,107 +133,8 @@ console.log(myVar)
   | |  __/ |  | \__ \
   |_|\___|_|  |_|___/
 
-
 <T>
 
-Mai
-Multiline
-Trods
-Lamov
-Kasinsky
-Vaisk
 
-Mai
-Multiline
-Trods
-Lamov
-Kasinsky
-Vaisk
-
-a
-
-Mai
-Multiline
-Trods
-Lamov
-Kasinsky
-Vaisk
-
-Mai
-Multiline
-Trods
-Lamov
-Kasinsky
-Vaisk
-
-Mai
-Multiline
-Trods
-Lamov
-Kasinsky
-Vaisk
-
-Mai
-Multiline
-Trods
-Lamov
-Kasinsky
-Vaisk
-
-Mai
-Multiline
-Trods
-Lamov
-Kasinsky
-Vaisk
-
-Mai
-Multiline
-Trods
-Lamov
-Kasinsky
-Vaisk
-Mai
-Multiline
-Trods
-Lamov
-Kasinsky
-Vaisk
-Mai
-Multiline
-Trods
-Lamov
-Kasinsky
-Vaisk
-Mai
-Multiline
-Trods
-Lamov
-Kasinsky
-Vaisk
-Mai
-Multiline
-Trods
-Lamov
-Kasinsky
-Vaisk
-Mai
-Multiline
-Trods
-Lamov
-Kasinsky
-Vaisk
-Mai
-Multiline
-Trods
-Lamov
-Kasinsky
-Vaisk
-Mai
-Multiline
-Trods
-Lamov
-Kasinsky
-Vaisk
 </B><L=1>To Document TOC</L> | <L=6>Back to Article Top</L>
 =========================================================================================================

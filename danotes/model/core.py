@@ -25,7 +25,7 @@ class Header:
         if len(lines) > 2:
             lines.pop()
             lines.pop()
-        output.append("<T>\n")
+
         return '\n'.join(output)
 
 class Content(list):
@@ -34,27 +34,76 @@ class Content(list):
         """Get the Content as a contiguous string."""
         return '\n'.join(self)
 
+
+class LinkTarget():
+    """Each Individual Link Target in the for of <I={buid}#{iid}>{label}</I>"""
+    ## Core methods -------------------
+    def __init__(self, label: str, iid: str):
+        self.label = label
+        self.iid = iid
+
+    def __repr__(self):
+        return f"LinkTarget(label={repr(self.label)}, iid={repr(self.iid)})"
+
+class LinksTarget(list):
+    """The Container of Link Target Objects within a Block"""
+    ## Core methods -------------------
+    def __init__(self, block: 'Block'):
+        super().__init__()  # Initialize the list properly
+        self.block = block
+        
+    def __repr__(self):
+        items = ', '.join(repr(item) for item in self)
+        return f"LinksTarget(block={self.block.buid}, items=[{items}])"
+
+    ## Output methods -----------------
+    def to_string(self) -> str:
+        output = []
+        for link_target in self:
+            # Access attributes directly since LinkTarget is a class, not a dict
+            output.append(f"- <L={self.block.buid}#{link_target.iid}>{link_target.label}</L>")
+
+        # Article TOC Tag
+        output.append("<T>")
+
+        return '\n'.join(output)
+
+
 class Block():
     """DAN Block Elements that get printed out and displayed, they contain the Inline elements"""
     ## Core methods -------------------
-    def __init__(self, label: str, buid: str, content: Content):
+    def __init__(self, label: str, buid: str, content: Content, links_target: LinksTarget):
         self.buid = buid
         self.label = label
         self.content = content
         self.header = Header(self)
+        self.links_target = LinksTarget(self)
     def __repr__(self):
         content_preview = ', '.join([repr(line.strip()) for line in self.content[:3]])
         if len(self.content) > 3:
             content_preview += f', ...(+{len(self.content)-3} more lines)'
-        return f"Block(buid='{self.buid}', label='{self.label}', content=[{content_preview}])"
+        return f"Block(buid='{self.buid}', label='{self.label}', content=[{content_preview}], links_target={repr(self.links_target)})"
     def to_dict(self) -> dict[str, any]:
         """Convert the Block to a JSON-serializable dictionary."""
         return {
             'buid': self.buid,
             'label': self.label,
-            'content': self.content  # Already a list (JSON-compatible)
+            'content': list(self.content),  # Convert Content to plain list
+            'links_target': [
+                {'label': lt.label, 'iid': lt.iid} 
+                for lt in self.links_target
+            ]
         }
 
+    ## Getter Methods -----------------
+    def get_links_target(self):
+        """Get the LinksTarget property for the given Block"""
+        for line in self.content:
+            match = re.search(r'(?<=<I=)([0-9a-zA-Z]+)#([0-9a-zA-Z]+)>(.*?)(?=</I>)', line)
+            if match:
+                self.links_target.append(LinkTarget(match.group(3), match.group(2)))
+
+        return self
 
     ## Modification methods -----------
     def append_query(self, query: str):
@@ -71,6 +120,8 @@ class Block():
 
     def to_string(self) -> str:
         output = self.header.to_string()
+        output = output + self.links_target.to_string()
+        output = output + "\n"
         output = output + self.content.to_string()
         return output
 
@@ -79,7 +130,6 @@ class Block():
         output = self.to_string()
         output = output + f'\n</B><L=1>To Document TOC</L> | <L={self.buid}>Back to Article Top</L>\n'
         return output + ('=' * 105) + "\n"
-
 
 
 class Danom(list):
@@ -98,7 +148,7 @@ class Danom(list):
 
                 if line == '':
                     if inside_block:  # If file ends while still in a block, save it
-                        self.append(Block(label, buid, content))
+                        self.append(Block(label, buid, content, links_target = []))
                     break
 
                 if inside_block == False:
@@ -116,7 +166,7 @@ class Danom(list):
                     else:
                         if re.search(r'^</B>.*', line):
                             inside_block = False
-                            self.append(Block(label, buid, content))   ## Create the Danom Block Object
+                            self.append(Block(label, buid, content, links_target = []))   ## Create the Danom Block Object
                         else :
                             content.append(line.rstrip('\n')) 
         return self
@@ -134,6 +184,11 @@ class Danom(list):
                 return block
         return None
 
+    def get_links_target(self):
+        for block in self:
+            block.get_links_target()
+        return self
+
     ## Helper Methods ----------------
     def get_next_available_buid(self) -> str:
         """Prints out the next available <buid> within that Danom"""
@@ -142,7 +197,7 @@ class Danom(list):
     ## Modification methods -----------
     def create_new_block(self, buid: str, new_label: str="Unnamed Article"):
         """Create a new Block on a given Danom"""
-        new_block = Block(new_label, buid, [])
+        new_block = Block(new_label, buid, [], [])
         self.append(new_block)
         return new_block
 
@@ -305,8 +360,6 @@ def create_new_header_block(path):
 # @section CORE_SUBROUTINES
 # @description Subroutines triggered directly by CLI Handlers
 
-
-
 def is_valid_dan_format(path):
     """Return if the file has proper .dan format"""
     with open(path, 'r', encoding='utf-8') as file:
@@ -355,4 +408,4 @@ def append_after_third_last_line(file_path, string_to_append, estimated_max_line
 ## ----------------------------------------------------------------------------
 
 
-__all__ = [ 'Block', 'Danom', 'Content', 'Header', 'is_valid_dan_format' , 'append_after_third_last_line' ]
+__all__ = [ 'Block', 'Danom', 'Content', 'Header', 'LinkTarget', 'LinksTarget', 'is_valid_dan_format' , 'append_after_third_last_line' ]

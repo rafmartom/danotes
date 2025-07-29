@@ -205,7 +205,7 @@ def main():
     link_show_parser_outputtype.add_argument("--json", help="Output to stdout as Danom Object", action="store_true")
     link_show_parser_outputtype.add_argument("--text", help="Output to stdout as formated dan text", action="store_true")
 
-    link_show_parser_filterby = link_show_parser.add_mutually_exclusive_group(required=True)
+    link_show_parser_filterby = link_show_parser.add_mutually_exclusive_group()
     link_show_parser_filterby.add_argument("-b", "--buid", help="Target Link buid")
     link_show_parser_filterby.add_argument("-u", "--uuid", help="Target Link uuid")
     link_show_parser_filterby.add_argument("-l", "--label", help="[Experimental] Target Link by Block label (must be unambiguous)")

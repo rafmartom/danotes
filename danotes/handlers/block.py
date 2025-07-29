@@ -14,6 +14,7 @@ def block_write(path, buid=None, query=None, new_label=None, json=False, text=Fa
 
     danom = Danom()
     danom.load(path)
+    danom.get_links_target()
 
 
     ## Getting the block
@@ -50,7 +51,7 @@ def block_write(path, buid=None, query=None, new_label=None, json=False, text=Fa
 
 
 def block_show(path, buid=None, label=None, json=False, text=False):
-    """Show and update a determined Dan Block Object
+    """Show/update a determined Dan Block Object
     If no --json and --text are given. Update in place the determined block
     If no --buid or --label are given. Show all the document from buid=0 to last
     """
@@ -61,6 +62,7 @@ def block_show(path, buid=None, label=None, json=False, text=False):
 
     danom = Danom(path)
     danom.load(path)
+    danom.get_links_target()
 
 
     ## Selecting target by block or whole danom
