@@ -6,6 +6,7 @@ def block_write(path, buid=None, query=None, new_label=None, json=False, text=Fa
     If not --new-label , but --query , it will append on the last block
     If target Block already exists will append text to it
     If target Block doesnt exist give an error
+    If target Block --buid 1 , will update the Toc Block (General Toc)
     """
     print(f"Writing {json=} {text=} {buid=} {path=} {query=} {new_label=} ")
 
@@ -19,13 +20,18 @@ def block_write(path, buid=None, query=None, new_label=None, json=False, text=Fa
 
     ## Getting the block
     if buid:
-        ## Block needs to exist
-        if danom.get_block_by_buid(buid):
+        ## Exceptions for buid=0 and buid=1
+        if buid == '0':
+            raise ValueError(f"{buid=} 0 cannot be modified")
+        elif buid == '1':
+            danom.update_toc_block()
             block = danom.get_block_by_buid(buid)
-        elif buid == '0' or buid == '1':
-            raise ValueError(f"{buid=} 0 or 1 cannot be modified")
         else:
-            raise ValueError(f"{buid=} does not exists within the file. What Block do you want to append text to?")
+            ## Block need to exists
+            if danom.get_block_by_buid(buid):
+                block = danom.get_block_by_buid(buid)
+            else:
+                raise ValueError(f"{buid=} does not exists within the file. What Block do you want to append text to?")
     ## If there is not buid create a new one
     elif not query:
         buid = danom.get_next_available_buid()

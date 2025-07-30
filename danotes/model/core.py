@@ -133,6 +133,7 @@ class Block():
     def to_text(self) -> str:
         """Get the Content of the Block with a horizontal line <hr> at the end"""
         output = self.to_string()
+        output = output + '\n'   ## Adding tralining empty line (lower-padding)
         output = output + f'\n</B><L=1>To Document TOC</L> | <L={self.buid}>Back to Article Top</L>\n'
         return output + ('=' * 105) + "\n"
 
@@ -174,6 +175,10 @@ class Danom(list):
                             self.append(Block(label, buid, content, links_target = []))   ## Create the Danom Block Object
                         else :
                             content.append(line.rstrip('\n')) 
+
+        ## Deleting the trailing empty line (lower-padding) that is added
+        for block in self:
+            block.content.pop()
         return self
 
 
@@ -255,6 +260,15 @@ class Danom(list):
     def create_new_toc_block(self):
         new_block = self.create_new_block("1", "Document TOC")
         return 
+
+    def update_toc_block(self):
+        """Update the Content of the special Block buid='1' (toc Block). With all the links formed""" 
+
+        # Reset it to an empty Content Object
+        self[1].content = Content()
+        for block in self:
+            self[1].content.append(f"- <L={block.buid}>{block.label}</L>")
+        return self
 
     ## Output methods -----------------
     def to_json(self, indent: int = 2) -> str:

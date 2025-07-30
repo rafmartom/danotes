@@ -287,6 +287,8 @@ echo -e "Mai\nMultiline\nTrods" | danotes file append test-sample/new-format.dan
 danotes file new test-sample/new-file.dano --text
 danotes file new test-sample/new-file.dano --json
 
+### Refresh the TOC Block
+danotes block write test-sample/new-format.dano --buid 1
 
 ## Parse link target
 danotes link show test-sample/new-format.dano --buid 2 --json
