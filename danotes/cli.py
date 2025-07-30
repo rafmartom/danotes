@@ -29,6 +29,16 @@ def cli_file_append(args):
     if result is not None:
         print(result, end='')
 
+def cli_file_update_toc(args):
+    result = file_update_toc(path=args.path)
+    if result is not None:
+        print(result, end='')
+
+def cli_file_refresh(args):
+    result = file_refresh(path=args.path)
+    if result is not None:
+        print(result, end='')
+
 def cli_block_write(args):
     # Handle stdin if no query provided
     if args.query is None and not sys.stdin.isatty():
@@ -74,29 +84,30 @@ def main():
         description="""
         danotes: .dan format notes writer
 
-        Most Common Uses:
+        CLI Interface Porcelain Commands (most used commands for users):
 
           # Start a new document from the scratch
-          danotes block write file.dan --buid 0
+          danotes file new test-sample/file.dan
 
           # Start a new article
-          danotes block write file.dan --label "My New Article"
-
-          Output: 4f
+          danotes block write test-sample/file.dan --new-label "My New Article"
 
           # Append some text to the new article
-          danotes block write file.dan --buid 4f --query "Here is some text"
+          echo -e "Here is\nsome text" | danotes block write test-sample/file.dan
+          printf "Here is" | danotes block write test-sample/file.dan
+          printf "Contiguous text" | danotes block write test-sample/file.dan
 
-          # Append some text to the new article (stdin)
-          echo "Here is some other text" | danotes block write file.dan --buid 4f
+          # Append some text to the new article via --query (only one line text supported), you can specify the buid too
+          danotes block write test-sample/file.dan --buid 2 --query "Here is some text"
 
           # Append a Dan Link to that article
-          danotes link write file.dan --buid 4f --label "New Link"
+          danotes link write test-sample/file.dan --new-label "New Link"
 
-          Output: 1
+          # Update the Block Toc and the file 
+          danotes file update toc
 
-          # Update the whole Document
-          danotes block write file.dan
+        Library Usage Porcelain Functions(most used functions for devs):
+
         """,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
@@ -130,6 +141,19 @@ def main():
     file_append_parser.add_argument("path", help="Input file")
 
     file_append_parser.add_argument("-q", "--query", help="Text to Input (If not present defaults to stdin)")
+
+    # file refresh
+    file_refresh_parser = file_subparsers.add_parser("refresh", help=file_refresh.__doc__, description=file_refresh.__doc__)
+    file_refresh_parser.add_argument("path", help="Input file")
+
+
+    # file update (subcommand group)
+    file_update_parser = file_subparsers.add_parser("update", help="Update operations")
+    file_update_subparsers = file_update_parser.add_subparsers(dest="update_target", required=True)
+
+    # file update toc
+    file_update_toc_parser = file_update_subparsers.add_parser("toc", help="Update TOC")
+    file_update_toc_parser.add_argument("path", help="Input file")
 
     ## EOF EOF EOF FILE 
     ## ----------------------------------------------------------------------------
@@ -232,6 +256,11 @@ def main():
             cli_file_new(args)
         if args.subcommand == "append":
             cli_file_append(args)
+        if args.subcommand == "update":
+            if args.update_target == "toc":
+                cli_file_update_toc(args)
+        if args.subcommand == "refresh":
+            cli_file_refresh(args)
 
 
     if args.command == "block":

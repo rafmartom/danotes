@@ -25,14 +25,7 @@ def link_write(path, buid, uuid, new_label=None, json=False, text=True):
     else :
         block = danom[-1]
 
-    if len(block.links_target):
-        iid = block.links_target[-1].iid
-    else:
-        iid = '1'
-    
-    iid = get_next_uid(iid)
-    block.links_target.new_link(new_label, iid)
-    block.append_query(f"<I={block.buid}#{iid}>{new_label}</I>")
+    block.append_link(new_label)
     danom.to_file(path)
     return iid
 

@@ -36,6 +36,8 @@ def block_write(path, buid=None, query=None, new_label=None, json=False, text=Fa
     elif not query:
         buid = danom.get_next_available_buid()
         block = danom.create_new_block(buid, new_label)
+        ## Upadte the Toc Block
+        danom.update_toc_block()
     ## If there is query but not buid get the last block
     else :
         block = danom[-1]

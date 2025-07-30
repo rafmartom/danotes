@@ -234,7 +234,67 @@ dannotes link show -b <buid> -i <iid> --text --json
 
 
 
+## Usage
+
+### CLI Interface
+
+CLI Interface Porcelain Commands (most used commands for users):
+```
+# Start a new document from the scratch
+danotes file new test-sample/file.dan
+
+# Start a new article
+danotes block write test-sample/file.dan --new-label "My New Article"
+
+# Append some text to the new article
+echo -e "Here is\nsome text" | danotes block write test-sample/file.dan
+printf "Here is" | danotes block write test-sample/file.dan
+printf "Contiguous text" | danotes block write test-sample/file.dan
+
+# Append some text to the new article via --query (only one line text supported), you can specify the buid too
+danotes block write test-sample/file.dan --buid 2 --query "Here is some text"
+
+# Append a Dan Link to that article
+danotes link write test-sample/file.dan --new-label "New Link"
+
+# Update the Block Toc and the file 
+danotes file update toc
+```
+
+### Library Usage
+
+
+```
+python3 -i -c 'from danotes import *'
+
+
+# Start a new document from the scratch
+danom = Danom()
+path = 'test-sample/file.dan'
+danom.create_new_header_block(path)
+danom.create_new_block('1', "Document TOC")
+
+# Start a new article
+block = danom.create_new_block(new_label="Article Name")
+
+# Append some text to the new article
+block.append_query('Here is\nsome text')
+
+# Append some text to the last article
+danom[-1].append_query('Here is\nsome text')
+
+
+# Append a Dan Link to that last article
+block.append_link('New Link')
+
+# Save to a file
+danom.to_file('test-sample/file.dan')
+```
+
+
 ## Pending to add in tests of the CLI Handlers and module itself
+
+
 
 ```
 danotes block show test-sample/new-format.dano
@@ -289,6 +349,8 @@ danotes file new test-sample/new-file.dano --json
 
 ### Refresh the TOC Block
 danotes block write test-sample/new-format.dano --buid 1
+# or
+danotes file update toc test-sample/new-format.dano
 
 ## Parse link target
 danotes link show test-sample/new-format.dano --buid 2 --json

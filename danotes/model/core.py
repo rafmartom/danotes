@@ -103,20 +103,45 @@ class Block():
     ## Getter Methods -----------------
     def get_links_target(self):
         """Get the LinksTarget property for the given Block"""
+        pattern = r'<I=([0-9a-zA-Z]+)#([0-9a-zA-Z]+)>(.*?)</I>'
+        
         for line in self.content:
-            match = re.search(r'(?<=<I=)([0-9a-zA-Z]+)#([0-9a-zA-Z]+)>(.*?)(?=</I>)', line)
-            if match:
-                self.links_target.append(LinkTarget(match.group(3), match.group(2)))
+            for match in re.finditer(pattern, line):
+                iid = match.group(2)
+                label = match.group(3)
+                self.links_target.append(LinkTarget(label, iid))
+                print(f"Link Target Found: buid={iid}, label={label} → {self.links_target=}")
 
         return self
+
+    ## Helper Methods -----------------
+    def get_next_available_iid(self) -> str:
+        """Get the next available iid for a Link"""
+        if len(self.links_target):
+            iid = block.links_target[-1].iid
+        else:
+            iid = '0'
+        iid = get_next_uid(iid)
+
+        return iid
+
 
     ## Modification methods -----------
     def append_query(self, query: str):
-        """Append Query to the Block's Content"""
-        content = query.splitlines()
-        self.content.extend(content)
+        """Append query to the last line of the Block's content (same line)"""
+        if self.content:
+            self.content[-1] += query
+        else:
+            self.content.append(query)  # fallback if content is empty
         return self
 
+    def append_link(self, new_label): 
+        """Append a new Link to the Block, both inside the Content and on the LinksTarget"""
+        iid = self.get_next_available_iid()
+        self.links_target.new_link(new_label, iid)
+        self.append_query(f"<I={self.buid}#{iid}>{new_label}</I>")
+
+        return self
 
     ## Output methods -----------------
     def to_json(self, indent: int = 2) -> str:
@@ -199,15 +224,21 @@ class Danom(list):
             block.get_links_target()
         return self
 
+
+
     ## Helper Methods ----------------
     def get_next_available_buid(self) -> str:
         """Prints out the next available <buid> within that Danom"""
         return get_next_uid(self[-1].buid)
 
     ## Modification methods -----------
-    def create_new_block(self, buid: str, new_label: str="Unnamed Article"):
+    def create_new_block(self, buid: str=None, new_label: str="Unnamed Article"):
         """Create a new Block on a given Danom"""
-        new_block = Block(new_label, buid, [], [])
+        ## Use the next available buid
+        if buid is None:
+            buid = self.get_next_available_buid()
+
+        new_block = Block(new_label, buid, Content(), [])
         self.append(new_block)
         return new_block
 
@@ -250,16 +281,15 @@ class Danom(list):
         new_block.content.append('dan_wrap_lines: 105')
         new_block.content.append('dan_indexed_from:')
         new_block.content.append('dan_parsed_on:')
-        new_block.content.append('dan_title: "{basename_no_ext}"')
+        new_block.content.append(f'dan_title: "{basename_no_ext}"')
         new_block.content.append('dan_description:')
         new_block.content.append('dan_tags: []')
-        new_block.content.append('')
 
         return new_block
 
     def create_new_toc_block(self):
         new_block = self.create_new_block("1", "Document TOC")
-        return 
+        return self
 
     def update_toc_block(self):
         """Update the Content of the special Block buid='1' (toc Block). With all the links formed""" 
@@ -279,6 +309,9 @@ class Danom(list):
         """Convert the Danom to a text string.Note: <hr> horizontal separators will be added"""
         output = []
         for block in self:
+            ## For Toc Block Update it before writting
+            if block.buid == "1":
+                self.update_toc_block()
             output.append(block.to_text())
         return ''.join(output)    
 
