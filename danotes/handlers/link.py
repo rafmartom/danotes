@@ -25,7 +25,7 @@ def link_write(path, buid, uuid, new_label=None, json=False, text=True):
     else :
         block = danom[-1]
 
-    block.append_link(new_label)
+    iid = block.append_link(new_label)
     danom.to_file(path)
     return iid
 

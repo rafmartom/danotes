@@ -37,3 +37,16 @@ def file_refresh(path):
     danom.get_links_target()
     danom.to_file(path)
     return f"{path} danom has been successfully updated.\n"
+
+
+
+def file_migrate(path):
+    """Migrate from vim-dan old syntax to danotes"""
+    transform_legacy_title(path) 
+
+    danom = Danom()
+    danom = danom.load(path)
+    danom = danom.update_from_legacy()
+    danom.to_file_notoc(path)
+
+    return f"{path} has been successfully migrated to new danotes syntax.\n"

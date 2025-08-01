@@ -39,6 +39,13 @@ def cli_file_refresh(args):
     if result is not None:
         print(result, end='')
 
+def cli_file_migrate(args):
+    result = file_migrate(path=args.path)
+    if result is not None:
+        print(result, end='')
+
+
+
 def cli_block_write(args):
     # Handle stdin if no query provided
     if args.query is None and not sys.stdin.isatty():
@@ -106,7 +113,6 @@ def main():
           # Update the Block Toc and the file 
           danotes file update toc
 
-        Library Usage Porcelain Functions(most used functions for devs):
 
         """,
         formatter_class=argparse.RawDescriptionHelpFormatter
@@ -154,6 +160,12 @@ def main():
     # file update toc
     file_update_toc_parser = file_update_subparsers.add_parser("toc", help="Update TOC")
     file_update_toc_parser.add_argument("path", help="Input file")
+
+
+    # file migrate
+    file_migrate_parser = file_subparsers.add_parser("migrate", help=file_migrate.__doc__, description=file_migrate.__doc__)
+    file_migrate_parser.add_argument("path", help="Input file")
+
 
     ## EOF EOF EOF FILE 
     ## ----------------------------------------------------------------------------
@@ -261,6 +273,8 @@ def main():
                 cli_file_update_toc(args)
         if args.subcommand == "refresh":
             cli_file_refresh(args)
+        if args.subcommand == "migrate":
+            cli_file_migrate(args)
 
 
     if args.command == "block":
