@@ -72,6 +72,7 @@ dan_tags: []
 - <L=2#2>Part B</L>
 - <L=2#3>Part C</L>
 <T>
+source: ""
 
 <I=1#1>Part A</I>
 Some text here explaining something
@@ -96,6 +97,7 @@ console.log(myVar)
 - <L=3#1>Part A</L>
 - <L=3#2>Part B</L>
 <T>
+source: ""
 
 <I=2#1>Part A</I>
 <I=2#2>Part B</I>
@@ -111,6 +113,11 @@ console.log(myVar)
  \___/|_| |_|_| |_|\__,_|_| |_| |_|\___|\__,_| /_/   \_\_|   \__|_|\___|_|\___|
 
 <T>
+source: "./path/to/unnamed.html"
+title_cmd: "cat ${FILE} | pup -i 0 --pre 'h1' | pandoc -f html -t plain"
+content_cmd: "cat ${FILE} | pup -i 0 --pre 'body' | pandoc -f html -t plain -V docu_path=${DPATH} -V parsed_title=${TITLE} -V file_no=${NO} -V file_processed=${PATH} -L ${DNOTESP}/indexing-links-target.lua"
+
+
 
 
 </B><L=1>To Document TOC</L> | <L=4>Back to Article Top</L>

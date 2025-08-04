@@ -292,6 +292,86 @@ danom.to_file('test-sample/file.dan')
 ```
 
 
+## Externally generated Blocks
+
+
+With `danotes` `.dan` files you have also the ability to create Blocks that generate from external sources.
+We have seen that we can create new blocks and write any notes there within those Blocks.
+Now also you can have some blocks that are generated from external sources, meaning this Blocks can be URL's to certain resources, or local references to certain files you want to get the information from.
+These Blocks are meant to only be used for reference. After writting them on the .dan file you shoudln't be altering them, because all the changes are prone to be deleted upon an update on the sources.
+May the `(X)` annotation tags persist accross updates only. But not even that.
+If you use them you are advised that you may loose those tags.
+
+
+For these we have added three properties. The `source` the `title_cmd` and the `content_cmd`.
+
+I will refer to User Blocks as UBlocks and Externaly Generated Blocks as EGBlocks
+
+### source
+If a Block doesn't provide of any, then it is unequivocally a `User Block` UBlock
+If the source is a subdir is also a `User Block`
+If the source is a file path or a url then is a EGBlock
+
+Example User Block
+```
+<B=3>Second Article (X)
+ ____                           _      _         _   _      _
+/ ___|  ___  ___ ___  _ __   __| |    / \   _ __| |_(_) ___| | ___
+\___ \ / _ \/ __/ _ \| '_ \ / _` |   / _ \ | '__| __| |/ __| |/ _ \
+ ___) |  __/ (_| (_) | | | | (_| |  / ___ \| |  | |_| | (__| |  __/
+|____/ \___|\___\___/|_| |_|\__,_| /_/   \_\_|   \__|_|\___|_|\___|
+
+- <L=3#1>Part A</L>
+- <L=3#2>Part B</L>
+<T>
+source: ""
+
+<I=2#1>Part A</I>
+<I=2#2>Part B</I>
+
+</B><L=1>To Document TOC</L> | <L=3>Back to Article Top</L>
+```
+
+Example EGBlock
+```
+<B=4>Unnamed Article (X)
+ _   _                                      _      _         _   _      _
+| | | |_ __  _ __   __ _ _ __ ___   ___  __| |    / \   _ __| |_(_) ___| | ___
+| | | | '_ \| '_ \ / _` | '_ ` _ \ / _ \/ _` |   / _ \ | '__| __| |/ __| |/ _ \
+| |_| | | | | | | | (_| | | | | | |  __/ (_| |  / ___ \| |  | |_| | (__| |  __/
+ \___/|_| |_|_| |_|\__,_|_| |_| |_|\___|\__,_| /_/   \_\_|   \__|_|\___|_|\___|
+
+<T>
+source: "./path/to/unnamed.html"
+title_cmd: "cat ${FILE} | pup -i 0 --pre 'h1' | pandoc -f html -t plain"
+content_cmd: "cat ${FILE} | pup -i 0 --pre 'body' | pandoc -f html -t plain -V dpath=${DPATH} -V title=${TITLE} -V buid=${BUID} -V file_processed=${PATH} -L ${DANP}/indexing-links-target.lua"
+
+
+
+
+</B><L=1>To Document TOC</L> | <L=4>Back to Article Top</L>
+```
+
+### title_cmd and content_cmd
+
+These two other variables are used to keep the information of the generation of the title `title_cmd` which generates the Block label
+The `content_cmd` is used to generate the content of the Block.
+
+In there you find with `sh` syntax the shortest possible command in order to replicate both title a content
+
+In order to keep this as short as possible we use some conventions such as these special vars:
+
+- `FILE` : Is the local path where the source file will be placed. It is `${DPATH}/${SOURCE}`
+- `TITLE` : Only usable in content_cmd , is the result of `title_cmd`
+- `LPATH` : Local Path . Expanded where the Document Specific Resources are Stored . It stores resources generated as `title-links-parsed.csv` and `DPATH`, also Specific pandoc-fitlers
+- `DPATH` : Download Path. Expanded to the temporary dir where the source files will be downloaded. It is `${LPATH}/downloaded`
+- `DANP` : Danotes Path. It is the local path where `danotes` resources are installed. This will be used for pandoc general filters and the like.
+- `BUID` : Block User Id , of the current Article, so the Writer can generate Links accordingly.
+
+A coming `danotes-generator` repository, will wrap the creation of `.dan` files with public available resources for certain topics.
+Say you want to have a `.dan` file with the `MDN Javascript` documentation, this repository will have scripts to generate that `.dan` file with all the Objects and Methods from their documentation sites. Also there will be a dump file ready to download (so you dont need to Crawl and process them)
+
+
 ## Pending to add in tests of the CLI Handlers and module itself
 
 

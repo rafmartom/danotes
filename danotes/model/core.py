@@ -4,6 +4,7 @@ import pyfiglet
 from pathlib import Path
 import os
 from typing import Self
+import yaml
 
 ## ----------------------------------------------------------------------------
 # @section OBJECT_MODEL_DEFINITIONS(DANOM)
@@ -82,18 +83,21 @@ class LinksTarget(list):
 class Block():
     """DAN Block Elements that get printed out and displayed, they contain the Inline elements"""
     ## Core methods -------------------
-    def __init__(self, label: str, buid: str, content: Content, title_marked: bool = False):
+    def __init__(self, label: str, buid: str, content: Content, title_marked: bool = False, source: str = '', title_cmd: str = '', content_cmd: str = ''):
         self.buid = buid
         self.label = label
         self.content = content
         self.header = Header(self)
         self.links_target = LinksTarget(self)
         self.title_marked = title_marked
+        self.source = source
+        self.title_cmd = title_cmd
+        self.content_cmd = content_cmd
     def __repr__(self):
         content_preview = ', '.join([repr(line.strip()) for line in self.content[:3]])
         if len(self.content) > 3:
             content_preview += f', ...(+{len(self.content)-3} more lines)'
-        return f"Block(buid='{self.buid}', label='{self.label}', content=[{content_preview}], links_target={repr(self.links_target)}, title_marked='{self.title_marked}')"
+        return f"Block(buid='{self.buid}', label='{self.label}', content=[{content_preview}], links_target={repr(self.links_target)}, title_marked='{self.title_marked}', source='{self.source}', title_cmd='{self.title_cmd}', content_cmd='{self.content_cmd}')"
     def to_dict(self) -> dict[str, any]:
         """Convert the Block to a JSON-serializable dictionary."""
         return {
@@ -185,6 +189,10 @@ class Danom(list):
         with open(path, 'r', encoding='utf-8') as file:
             inside_block = False
             inside_header = True
+            inside_yaml = True
+            source = ''
+            title_cmd = ''
+            content_cmd = ''
             content = Content()
 
             while True:
@@ -192,7 +200,7 @@ class Danom(list):
 
                 if line == '':
                     if inside_block:  # If file ends while still in a block, save it
-                        self.append(Block(label, buid, content, title_marked=title_marked))
+                        self.append(Block(label, buid, content, title_marked=title_marked, source=source, title_cmd=title_cmd, content_cmd=content_cmd))
                     break
 
                 if inside_block == False:
@@ -201,6 +209,7 @@ class Danom(list):
                     if block_otag_match:
                         inside_block = True
                         inside_header = True
+                        inside_yaml = True
                         buid = block_otag_match.group(1)
                         label_unfiltered = block_otag_match.group(2)
                         ## Some of the block Opening Tags Line May be Marked
@@ -219,9 +228,22 @@ class Danom(list):
                     else:
                         if re.search(r'^</B>.*', line):
                             inside_block = False
-                            self.append(Block(label, buid, content, title_marked=title_marked))   ## Create the Danom Block Object
-                        else :
-                            content.append(line.rstrip('\n')) 
+                            self.append(Block(label, buid, content, title_marked=title_marked, source=source, title_cmd=title_cmd, content_cmd=content_cmd))   ## Create the Danom Block Object
+                        else:
+                            if inside_yaml:
+                                yaml_var = check_yaml_line(line)
+                                if yaml_var:
+                                    # Extract variables if they exist, else set to None
+                                    source = yaml_var.get('source', source)
+                                    title_cmd = yaml_var.get('title_cmd', title_cmd)
+                                    content_cmd = yaml_var.get('content_cmd', content_cmd)
+                                    content.append(line.rstrip('\n')) 
+                                else:
+                                    inside_yaml = False
+                                    content.append(line.rstrip('\n')) 
+                            else:
+                                content.append(line.rstrip('\n')) 
+
 
         ## Deleting the trailing empty line (lower-padding) that is added
         for block in self:
@@ -585,6 +607,18 @@ def transform_legacy_title(path):
     with open(path, 'w', encoding='utf-8') as file:
         file.writelines(result_lines)
 
+
+def check_yaml_line(line):
+    try:
+        # Attempt to parse the line as YAML
+        yaml_content = yaml.safe_load(line)
+        # Check if the result is a dictionary (valid YAML key-value pair)
+        if isinstance(yaml_content, dict):
+            return yaml_content
+        return False
+    except yaml.YAMLError:
+        # Return False if the line is not valid YAML
+        return False
 
 
 ## EOF EOF EOF HELPERS 
