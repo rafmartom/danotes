@@ -366,7 +366,7 @@ danotes link write test-sample/new-format.dano --new-label 'My link'
 ## Debugging interactively
 python3 -i -c 'from danotes import *'
 danom = Danom()
-danom.load('test-sample/new-format.dano')
+danom.load('test-sample/new-format.dan')
 print(danom[2].links_target)
 
 danom.create_new_header_block('test-sample/new-file.dano')

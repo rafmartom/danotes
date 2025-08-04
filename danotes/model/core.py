@@ -17,7 +17,12 @@ class Header:
     def to_string(self) -> str:
         """Get the Header of a Block as a contiguous string using Block's buid and label."""
         output = []
-        output.append(f"<B={self.block.buid}>{self.block.label}")
+
+        if self.block.title_marked:
+            output.append(f"<B={self.block.buid}>{self.block.label} (X)")
+        else:
+            output.append(f"<B={self.block.buid}>{self.block.label}")
+
         pyfiglet_string = pyfiglet.figlet_format(self.block.label)
         lines = [line.rstrip() for line in pyfiglet_string.split('\n')]
         output.extend(lines)
@@ -77,17 +82,18 @@ class LinksTarget(list):
 class Block():
     """DAN Block Elements that get printed out and displayed, they contain the Inline elements"""
     ## Core methods -------------------
-    def __init__(self, label: str, buid: str, content: Content, links_target: LinksTarget):
+    def __init__(self, label: str, buid: str, content: Content, title_marked: bool = False):
         self.buid = buid
         self.label = label
         self.content = content
         self.header = Header(self)
         self.links_target = LinksTarget(self)
+        self.title_marked = title_marked
     def __repr__(self):
         content_preview = ', '.join([repr(line.strip()) for line in self.content[:3]])
         if len(self.content) > 3:
             content_preview += f', ...(+{len(self.content)-3} more lines)'
-        return f"Block(buid='{self.buid}', label='{self.label}', content=[{content_preview}], links_target={repr(self.links_target)})"
+        return f"Block(buid='{self.buid}', label='{self.label}', content=[{content_preview}], links_target={repr(self.links_target)}, title_marked='{self.title_marked}')"
     def to_dict(self) -> dict[str, any]:
         """Convert the Block to a JSON-serializable dictionary."""
         return {
@@ -110,8 +116,6 @@ class Block():
                 iid = match.group(2)
                 label = match.group(3)
                 self.links_target.append(LinkTarget(label, iid))
-                print(f"Link Target Found: buid={iid}, label={label} → {self.links_target=}")
-
         return self
 
     ## Helper Methods -----------------
@@ -149,7 +153,16 @@ class Block():
         return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)
 
     def to_string(self) -> str:
-        output = self.header.to_string()
+
+        ## First block cannot start with an empty line
+        if self.buid != "0":
+            if self.title_marked:
+                output = ' (X)' + "\n" + self.header.to_string()
+            else:
+                output = "\n" + self.header.to_string()
+        else:
+            output = self.header.to_string()
+
         output = output + self.links_target.to_string()
         output = output + "\n"
         output = output + self.content.to_string()
@@ -160,7 +173,7 @@ class Block():
         output = self.to_string()
         output = output + '\n'   ## Adding tralining empty line (lower-padding)
         output = output + f'\n</B><L=1>To Document TOC</L> | <L={self.buid}>Back to Article Top</L>\n'
-        return output + ('=' * 105) + "\n"
+        return output + ('=' * 105)
 
 
 class Danom(list):
@@ -179,16 +192,25 @@ class Danom(list):
 
                 if line == '':
                     if inside_block:  # If file ends while still in a block, save it
-                        self.append(Block(label, buid, content, links_target = []))
+                        self.append(Block(label, buid, content, title_marked=title_marked))
                     break
 
                 if inside_block == False:
+                    ## Checking for all the Block Opening Tags Line
                     block_otag_match = re.search(r'(?<=<B=)([0-9a-zA-Z]+)>([^<\n]+)', line)
                     if block_otag_match:
                         inside_block = True
                         inside_header = True
                         buid = block_otag_match.group(1)
-                        label = block_otag_match.group(2)
+                        label_unfiltered = block_otag_match.group(2)
+                        ## Some of the block Opening Tags Line May be Marked
+                        label_match = re.search(r'(.*)( \(X\))', label_unfiltered)
+                        if label_match:
+                            label = label_match.group(1)
+                            title_marked = True
+                        else:
+                            label = label_unfiltered
+                            title_marked = False
                         content = Content()
                 else:
                     if inside_header == True:
@@ -197,7 +219,7 @@ class Danom(list):
                     else:
                         if re.search(r'^</B>.*', line):
                             inside_block = False
-                            self.append(Block(label, buid, content, links_target = []))   ## Create the Danom Block Object
+                            self.append(Block(label, buid, content, title_marked=title_marked))   ## Create the Danom Block Object
                         else :
                             content.append(line.rstrip('\n')) 
 
@@ -239,7 +261,7 @@ class Danom(list):
         if buid is None:
             buid = self.get_next_available_buid()
 
-        new_block = Block(new_label, buid, Content(), [])
+        new_block = Block(new_label, buid, Content())
         self.append(new_block)
         return new_block
 
@@ -299,7 +321,10 @@ class Danom(list):
         # Reset it to an empty Content Object
         self[1].content = Content()
         for block in self:
-            self[1].content.append(f"- <L={block.buid}>{block.label}</L>")
+            if block.title_marked:
+                self[1].content.append(f"- <L={block.buid}>{block.label}</L> (X)")
+            else:
+                self[1].content.append(f"- <L={block.buid}>{block.label}</L>")
         return self
 
     def update_from_legacy(self):
@@ -371,7 +396,7 @@ class Danom(list):
 
         # Step 2) Create the Header block
         basename_no_ext = self[0].label
-        new_block = Block(basename_no_ext, "0", Content(), [])
+        new_block = Block(basename_no_ext, "0", Content())
 
 
         new_block.content.append("")
