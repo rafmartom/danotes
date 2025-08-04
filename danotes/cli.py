@@ -111,8 +111,11 @@ def main():
           danotes link write test-sample/file.dan --new-label "New Link"
 
           # Update the Block Toc and the file 
-          danotes file update toc
+          danotes file update toc test-sample/file.dan
+          danotes block write test-sample/file.dan
 
+          # Update file without Toc Block and not individual Block Toc
+          danotes file update notoc test-sample/file.dan
 
         """,
         formatter_class=argparse.RawDescriptionHelpFormatter
@@ -161,6 +164,9 @@ def main():
     file_update_toc_parser = file_update_subparsers.add_parser("toc", help="Update TOC")
     file_update_toc_parser.add_argument("path", help="Input file")
 
+    # file update toc
+    file_update_notoc_parser = file_update_subparsers.add_parser("notoc", help="Whole file except the Toc Block,for each file no Block Toc will be generated")
+    file_update_notoc_parser.add_argument("path", help="Input file")
 
     # file migrate
     file_migrate_parser = file_subparsers.add_parser("migrate", help=file_migrate.__doc__, description=file_migrate.__doc__)

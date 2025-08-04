@@ -30,6 +30,14 @@ def file_update_toc(path):
     danom.to_file(path)
     return f"{path} toc block has been succesfully update alongside its danom.\n"
 
+def file_update_notoc(path):
+    """Will update the whole file without putting any article toc and not altering Toc Block (useful for vim-dan-generator .dan files) """
+    danom = Danom()
+    danom.load(path)
+    danom.to_file(path)
+
+    pass
+
 def file_refresh(path):
     """Alias for danotes block write which updates all the file"""
     danom = Danom()
