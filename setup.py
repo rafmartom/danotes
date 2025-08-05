@@ -10,7 +10,8 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        "pyfiglet>=1.0.3"
+        "pyfiglet>=1.0.3",
+        "pyyaml>=6.0"
         ],
     entry_points={
         "console_scripts": [

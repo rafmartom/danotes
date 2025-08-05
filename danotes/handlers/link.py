@@ -1,4 +1,4 @@
-from ..model.core import *
+from ..model import *
 
 def link_write(path, buid, uuid, new_label=None, json=False, text=True):
     """Write a determined Dan Link Object"""

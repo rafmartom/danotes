@@ -1,4 +1,4 @@
-from ..model.core import *
+from ..model import *
 
 def file_new(path, json=False, text=True):
     """Create the Header and TOC blocks of a New File"""

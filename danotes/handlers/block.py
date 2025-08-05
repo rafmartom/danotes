@@ -1,4 +1,5 @@
-from ..model.core import *
+from ..model import *
+
 
 def block_write(path, buid=None, query=None, new_label=None, json=False, text=False):
     """Write a determined Dan Block Object. 
