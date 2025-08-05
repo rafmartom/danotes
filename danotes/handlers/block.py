@@ -69,7 +69,7 @@ def block_show(path, buid=None, label=None, json=False, text=False):
     if not is_valid_dan_format(path):
         raise ValueError(f"{path} Invalid file type. Expected .dan syntax within. If the path is correct you may want to fix it")
 
-    danom = Danom(path)
+    danom = Danom()
     danom.load(path)
     danom.get_links_target()
 
@@ -79,6 +79,8 @@ def block_show(path, buid=None, label=None, json=False, text=False):
         case (None, None):
             target = danom
         case (buid, None) if buid is not None:  # Check buid is not None
+            if buid == '1':
+                danom.update_toc_block()
             if danom.get_block_by_buid(buid):
                 target = danom.get_block_by_buid(buid)
             else:

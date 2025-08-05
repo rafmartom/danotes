@@ -5,11 +5,13 @@ Root Dan Object Model (Danom) Implementation.
 import re
 import json
 import pyfiglet
-from pathlib import Path
+from pathlib import Path, PurePath
 import os
 from typing import Self
 import yaml
+from treelib import Node, Tree
 import danotes.model
+
 
 
 class Danom(list):
@@ -61,6 +63,10 @@ class Danom(list):
                         if re.search(r'^</B>.*', line):
                             inside_block = False
                             self.append(danotes.model.Block(label, buid, content, title_marked=title_marked, source=source, title_cmd=title_cmd, content_cmd=content_cmd))   ## Create the Danom Block Object
+                            # Need to restart the vars
+                            source = ''
+                            title_cmd = ''
+                            content_cmd = ''
                         else:
                             if inside_yaml:
                                 yaml_var = danotes.model.check_yaml_line(line)
@@ -172,13 +178,56 @@ class Danom(list):
     def update_toc_block(self):
         """Update the Content of the special Block buid='1' (toc Block). With all the links formed""" 
 
+        # Create a tree
+        tree = Tree()
+        # Create a root node (optional, can be the base directory or a placeholder)
+        tree.create_node("/", "root")  # Root of the file system
+        # Track directories to avoid duplicates
+        created_dirs = set()
+
+
         # Reset it to an empty Content Object
         self[1].content = danotes.model.Content()
         for block in self:
-            if block.title_marked:
-                self[1].content.append(f"- <L={block.buid}>{block.label}</L> (X)")
+
+
+            # Normalize the path and split into components
+            if not block.source:
+                source = ""
             else:
-                self[1].content.append(f"- <L={block.buid}>{block.label}</L>")
+                source = os.path.normpath(block.source)
+
+            source = PurePath(source).parent.as_posix()
+            path_parts = source.strip("/").split("/")
+
+            # Build the tree path
+            current_path = ""
+            parent_id = "root"
+
+
+            # Create directory nodes
+            for part in path_parts:
+                current_path = os.path.join(current_path, part)
+                if current_path not in created_dirs:
+                    tree.create_node(part, current_path, parent=parent_id)
+                    created_dirs.add(current_path)
+                parent_id = current_path
+
+
+            # Add the label as a leaf node with buid
+            leaf_id = f"{current_path}/{block.buid}"
+
+            if block.title_marked:
+                tree.create_node(f"<L={block.buid}>{block.label}</L> (X)", leaf_id, parent=current_path)
+            else:
+                tree.create_node(f"<L={block.buid}>{block.label}</L>", leaf_id, parent=current_path)
+
+            # Get the tree as a string
+            tree_string = tree.show(stdout = False)
+
+            # Optionally, convert the string to a list of lines
+            tree_lines = tree_string.split("\n")
+        self[1].content.extend(tree_lines) 
         return self
 
     def update_from_legacy(self):
@@ -300,7 +349,7 @@ class Danom(list):
         for block in self:
             ## For Toc Block Update it before writting
             if block.buid == "1":
-                self.update_toc_danotes.model.Block()
+                self.update_toc_block()
             output.append(block.to_text())
         return ''.join(output)    
 

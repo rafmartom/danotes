@@ -11,7 +11,8 @@ setup(
     include_package_data=True,
     install_requires=[
         "pyfiglet>=1.0.3",
-        "pyyaml>=6.0"
+        "pyyaml>=6.0",
+        "treelib>=1.8.0"
         ],
     entry_points={
         "console_scripts": [
