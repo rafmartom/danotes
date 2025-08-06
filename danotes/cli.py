@@ -34,6 +34,12 @@ def cli_file_update_toc(args):
     if result is not None:
         print(result, end='')
 
+def cli_file_update_notoc(args):
+    result = file_update_notoc(path=args.path)
+    if result is not None:
+        print(result, end='')
+
+
 def cli_file_refresh(args):
     result = file_refresh(path=args.path)
     if result is not None:
@@ -277,6 +283,8 @@ def main():
         if args.subcommand == "update":
             if args.update_target == "toc":
                 cli_file_update_toc(args)
+            if args.update_target == "notoc":
+                cli_file_update_notoc(args)
         if args.subcommand == "refresh":
             cli_file_refresh(args)
         if args.subcommand == "migrate":
