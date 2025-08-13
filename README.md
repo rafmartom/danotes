@@ -454,4 +454,12 @@ danom.create_new_header_block('test-sample/new-file.dano')
 
 ## Local Debugging
 gitToTermbin -x "*README.md" -x "*test-sample*"
+
+## testing the toc block tree hierarchy
+danotes block write test-sample/new-format.dan --source "./tutorials/" --new-label "Tutorial-A"
+danotes block write test-sample/new-format.dan --source "./tutorials/" --new-label "Tutorial-AB"
+danotes block write test-sample/new-format.dan --source "./tobject-model/" --new-label "Object-A"
+danotes block write test-sample/new-format.dan --source "./tobject-model/" --new-label "Object-B"
+
+
 ```

@@ -135,6 +135,12 @@ def check_yaml_line(line):
         return False
 
 
+def is_a_dir_path(path_str: str) -> bool:
+    """Check if a string looks like a directory path (without filesystem checks)."""
+    # Manually check for trailing slash (PurePath strips it)
+    return path_str.endswith('/') or path_str.endswith('\\')
+
+
 ## EOF EOF EOF HELPERS 
 ## ----------------------------------------------------------------------------
 
@@ -192,4 +198,4 @@ def append_after_third_last_line(file_path, string_to_append, estimated_max_line
 ## EOF EOF EOF CORE_SUBROUTINES 
 ## ----------------------------------------------------------------------------
 
-__all__ = [ 'is_valid_dan_format' , 'append_after_third_last_line', 'get_next_uid', 'transform_legacy_title', 'check_yaml_line']
+__all__ = [ 'is_valid_dan_format' , 'append_after_third_last_line', 'get_next_uid', 'transform_legacy_title', 'check_yaml_line', 'is_a_dir_path']

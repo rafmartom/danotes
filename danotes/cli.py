@@ -60,7 +60,7 @@ def cli_block_write(args):
     # Use default "Unnamed Article" if new_label is None
     new_label = args.new_label if args.new_label is not None else "Unnamed Article"
 
-    result = block_write(path=args.path, buid=args.buid, query=args.query, new_label=new_label, json=args.json, text=args.text)
+    result = block_write(path=args.path, buid=args.buid, query=args.query, new_label=new_label, source=args.source, json=args.json, text=args.text)
     if result is not None:
         print(result, end='')
 
@@ -68,6 +68,12 @@ def cli_block_show(args):
     result = block_show(path=args.path, buid=args.buid, label=args.label, json=args.json, text=args.text)
     if result is not None:
         print(result, end='')
+
+def cli_block_source(args):
+    result = block_source(path=args.path, buid=args.buid, source=args.source, title=args.title, content=args.content, json=args.json, text=args.text)
+    if result is not None:
+        print(result, end='')
+
 
 def cli_link_write(args):
     # Use default "Unnamed Article" if new_label is None
@@ -115,6 +121,24 @@ def main():
 
           # Append a Dan Link to that article
           danotes link write test-sample/file.dan --new-label "New Link"
+
+          # (For EGB) Update a certain EGB block acording to source
+          danotes block source test-sample/new-format.dan --buid 2
+
+          # (For EGB) Update all EGB blocks according to their sources
+          danotes block source test-sample/new-format.dan
+
+          # (For EGB) Create a new EGB block with a certain source
+
+          ## For webs
+          danotes block source test-sample/new-format.dan --source "https://requests.readthedocs.io/en/latest/" --title "h1" --content "section"
+
+          ## For man pages
+          danotes block source test-sample/new-format.dan --source "man true" 
+          ## For help
+          danotes block source test-sample/new-format.dan --source "true --help" 
+          ## For cmd's (you need to specify --title)
+          danotes block source test-sample/new-format.dan --source "hostnamectl | grep -E 'Operating System|Kernel|Architecture'" --title "Operative System Keynel Architecture"
 
           # Update the Block Toc and the file 
           danotes file update toc test-sample/file.dan
@@ -201,6 +225,7 @@ def main():
     block_write_parser.add_argument("-b", "--buid", help="Target Block by buid")
 
 
+    block_write_parser.add_argument("--source", help="Path source of the Block (for tree hierarchy)")
     block_write_parser.add_argument("-q", "--query", help="Text to Input (If not present defaults to stdin)")
     block_write_parser.add_argument("-n", "--new-label", help="Text Label of the New Block Target (for when creating a new block)")
 
@@ -219,6 +244,21 @@ def main():
 
     block_show_parser.add_argument("path", help="Input file")
 
+
+    # block source
+    block_source_parser = block_subparsers.add_parser("source", help=block_source.__doc__, description=block_source.__doc__)
+    block_source_parser_outputtype = block_source_parser.add_mutually_exclusive_group()
+    block_source_parser_outputtype.add_argument("--json", help="Output to stdout as Danom Object", action="store_true")
+    block_source_parser_outputtype.add_argument("--text", help="Output to stdout as formated dan text", action="store_true")
+
+    block_source_parser_filterby = block_source_parser.add_mutually_exclusive_group()
+    block_source_parser_filterby.add_argument("-b", "--buid", help="Target Block by buid")
+
+    block_source_parser.add_argument("path", help="Input file")
+
+    block_source_parser.add_argument("--source", help="Path/URL/cmd source of the Generated Content")
+    block_source_parser.add_argument("--title", help="Title parsing rules")
+    block_source_parser.add_argument("--content", help="Content parsing rules")
     ## EOF EOF EOF BLOCK 
     ## ----------------------------------------------------------------------------
 
@@ -294,9 +334,11 @@ def main():
     if args.command == "block":
         if args.subcommand == "write":
             cli_block_write(args)
-
         elif args.subcommand == "show":
             cli_block_show(args)
+        elif args.subcommand == "source":
+            cli_block_source(args)
+
 
     elif args.command == "link":
         if args.subcommand == "write":

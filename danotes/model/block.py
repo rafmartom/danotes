@@ -10,11 +10,32 @@ import os
 from typing import Self
 import yaml
 import danotes.model
+import subprocess
 
 class Block():
     """DAN Block Elements that get printed out and displayed, they contain the Inline elements"""
     ## Core methods -------------------
-    def __init__(self, label: str, buid: str, content: 'Content', title_marked: bool = False, source: str = '', title_cmd: str = '', content_cmd: str = ''):
+    def __init__(
+        self,
+        label: str,
+        buid: str,
+        content: 'Content',
+        title_marked: bool = False,
+        source: str = '',
+        title_cmd: str = '',
+        content_cmd: str = ''
+    ):
+        """Initialize the object with content and metadata.
+
+        Args:
+            label: Identifier label for the content
+            buid: Unique identifier string
+            content: Content object (forward reference)
+            title_marked: Whether title is specially marked (default: False)
+            source: Source description (default: '')
+            title_cmd: Command to generate title (default: '')
+            content_cmd: Command to generate content (default: '')
+        """
         self.buid = buid
         self.label = label
         self.content = content
@@ -53,6 +74,33 @@ class Block():
                 self.links_target.append(danotes.model.LinkTarget(label, iid))
         return self
 
+    ## Test Methods -------------------
+    def is_path(self) -> bool:
+        try:
+            # Attempt to create a Path object (validates path syntax)
+            Path(self.source)
+            return True
+        except (TypeError, ValueError):
+            # Catches illegal paths (e.g., containing null bytes)
+            return False
+
+    def is_web_url(self) -> bool:
+        return bool(re.match(r'^(http|https|ftp)://', self.source))
+
+    def is_egb(self):
+        """
+        Return True if is a EGB Externally Generated Block
+        Everything will be considered EGB except directory paths or no source
+        """
+        if not self.source:
+            return False
+        if self.is_path():
+            return False
+        else:
+            return True
+
+
+
     ## Helper Methods -----------------
     def get_next_available_iid(self) -> str:
         """Get the next available iid for a Link"""
@@ -81,6 +129,24 @@ class Block():
         self.append_query(f"<I={self.buid}#{iid}>{new_label}</I>")
 
         return self
+
+    def update_content(self):
+        """
+        Update the Content text :
+            - for a EGB will check self.source self.title_cmd self.content_cmd
+        And update the content accordingly
+        """
+        cmd = self.source
+        process = subprocess.run(cmd, shell = True, capture_output= True, text = True)
+
+        # Create Content object directly from the processed lines
+#        self.content = danotes.model.Content(process.stdout.splitlines())
+        self.content.extend(process.stdout.splitlines())
+
+            #            line.strip() for line in process.stdout.splitlines() if line.strip()
+        return self
+
+
 
     ## Output methods -----------------
     def to_json(self, indent: int = 2) -> str:

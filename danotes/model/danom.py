@@ -115,13 +115,18 @@ class Danom(list):
         return danotes.model.get_next_uid(self[-1].buid)
 
     ## Modification methods -----------
-    def create_new_block(self, buid: str=None, new_label: str="Unnamed Article"):
+    def create_new_block(self, buid: str=None, new_label: str="Unnamed Article", source: str=None):
         """Create a new Block on a given Danom"""
         ## Use the next available buid
         if buid is None:
             buid = self.get_next_available_buid()
 
-        new_block = danotes.model.Block(new_label, buid, danotes.model.Content())
+        content = []
+        if source:
+            content.append(f'source: "{source}"')
+
+        new_block = danotes.model.Block(label = new_label, buid = buid, content = danotes.model.Content(content), source = source)
+        print(f'Creating new_block {new_block.title_marked=} {new_label=} {buid=} {source=}')
         self.append(new_block)
         return new_block
 
@@ -150,7 +155,7 @@ class Danom(list):
         new_block.content.append("")
         new_block.content.append('dan_ext_list: []')
         new_block.content.append('dan_kw_question_list: []')
-        new_block.content.append('dan_kw_nontext_list: []')
+        ##new_block.content.append('dan_kw_nontext_list: []')
         new_block.content.append('dan_kw_linenr_list: []')
         new_block.content.append('dan_kw_warningmsg_list: []')
         new_block.content.append('dan_kw_colorcolumn_list: []')
@@ -190,6 +195,10 @@ class Danom(list):
         self[1].content = danotes.model.Content()
         for block in self:
 
+            is_a_dir = False
+            if danotes.model.is_a_dir_path(block.source):
+                is_a_dir = True
+
 
             # Normalize the path and split into components
             if not block.source:
@@ -197,7 +206,9 @@ class Danom(list):
             else:
                 source = os.path.normpath(block.source)
 
-            source = PurePath(source).parent.as_posix()
+            if not is_a_dir:
+                source = PurePath(source).parent.as_posix()
+
             path_parts = source.strip("/").split("/")
 
             # Build the tree path
