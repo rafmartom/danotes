@@ -11,6 +11,7 @@ from typing import Self
 import yaml
 import danotes.model
 import subprocess
+from bs4 import BeautifulSoup, Comment
 
 class Block():
     """DAN Block Elements that get printed out and displayed, they contain the Inline elements"""
@@ -130,22 +131,151 @@ class Block():
 
         return self
 
-    def update_content(self):
+    def update_content(self, path):
         """
         Update the Content text :
             - for a EGB will check self.source self.title_cmd self.content_cmd
         And update the content accordingly
+        There is 3 conditions for a existing source to generate an EGB:
+            - Run the string and Exit Status 0 . Stdout as content (DANGEROUS Code Injection!!)
+            - If the String is an existing local path (if is a text file cat it , if is .html use pandoc)
+            - Is a URL (use wget, and if Exit Status 0 , apply pandoc with self.title_cmd , and self.content_cmd)
         """
-        cmd = self.source
-        process = subprocess.run(cmd, shell = True, capture_output= True, text = True)
 
-        # Create Content object directly from the processed lines
-#        self.content = danotes.model.Content(process.stdout.splitlines())
-        self.content.extend(process.stdout.splitlines())
+        ## If it is not an EGB leave it as it is
+        if not self.source or danotes.model.is_a_dir_path(self.source) and not danotes.model.is_url(self.source):
+            return self
+        
+        ## Re-instating the content from 0
+        self.content = danotes.model.Content()
 
-            #            line.strip() for line in process.stdout.splitlines() if line.strip()
-        return self
+        if self.source:
+            self.content.append(f'source: "{self.source}"')
+        if self.title_cmd:
+            self.content.append(f'title_cmd: "{self.title_cmd}"')
+        if self.content_cmd:
+            self.content.append(f'content_cmd: "{self.content_cmd}"')
 
+
+        process = subprocess.run(self.source, shell = True, capture_output= True, text = True)
+
+        if process.returncode == 0:
+            self.content.extend([''])
+            self.content.extend(process.stdout.splitlines())
+            return self
+        else:
+            ## Downloading if it is a url
+            if danotes.model.is_url(self.source):
+                try:
+                    download_dir, filename = danotes.model.index_file(self.source, path)
+                    file_path = download_dir / filename
+                    
+                    with open(file_path) as file:
+                        soup = BeautifulSoup(file, features="lxml")
+
+                        # Remove all JavaScript (<script> tags)
+                        for script in soup.find_all("script"):
+                            script.decompose()  # Remove the entire tag
+
+                        # Remove all inline styles and external CSS (<style> tags)
+                        for style in soup.find_all("style"):
+                            style.decompose()
+
+                        # Remove ALL 'style' attributes from any tag
+                        for tag in soup.find_all(True):  # True = match all tags
+                            if 'style' in tag.attrs:
+                                del tag.attrs['style']
+
+                        # Remove all HTML comments from the soup
+                        for comment in soup.find_all(string=lambda text: isinstance(text, Comment)):
+                            comment.extract()  # Remove the comment
+
+                        if self.title_cmd:
+                            title = soup.select(self.title_cmd)[0].get_text(strip=True)
+                        else:
+                            title = Path(filename).stem
+                        if self.content_cmd:
+                            content = soup.select(self.content_cmd)[0]
+                        else:
+                            content = soup.body
+
+                    cmd = f'echo "{content}" | pandoc -f html -t plain '
+                    process = subprocess.run(cmd, shell = True, capture_output= True, text = True)
+
+                    self.label = title
+
+                    self.content.extend([''])
+                    self.content.extend(process.stdout.splitlines())
+                    return self
+                except subprocess.CalledProcessError as e:
+                    raise RuntimeError(f"Failed to download or process file: {e.stderr}") from e
+                except FileNotFoundError as e:
+                    raise RuntimeError(f"File not found: {file_path}") from e
+                except Exception as e:
+                    raise RuntimeError(f"Unexpected error processing {self.source}: {str(e)}") from e
+            ## Case for local file
+            else:
+                ## Regularize if it is a relative path
+                if not Path(self.source).is_absolute():
+                    regularized_path = Path(path).parent.joinpath(Path(self.source))
+                else:
+                    regularized_path = Path(path).joinpath(Path(self.source))
+
+                if regularized_path.is_file():
+                    with open(regularized_path) as file:
+                        ## Case that local file an .html
+                        if re.match(r'\.(?:html|htm)', Path(self.source).suffix):
+                            soup = BeautifulSoup(file, features="lxml")
+
+                            # Remove all JavaScript (<script> tags)
+                            for script in soup.find_all("script"):
+                                script.decompose()  # Remove the entire tag
+
+                            # Remove all inline styles and external CSS (<style> tags)
+                            for style in soup.find_all("style"):
+                                style.decompose()
+
+                            # Remove ALL 'style' attributes from any tag
+                            for tag in soup.find_all(True):  # True = match all tags
+                                if 'style' in tag.attrs:
+                                    del tag.attrs['style']
+
+                            # Remove all HTML comments from the soup
+                            for comment in soup.find_all(string=lambda text: isinstance(text, Comment)):
+                                comment.extract()  # Remove the comment
+
+
+                            if self.title_cmd:
+                                title = soup.select(self.title_cmd)[0].get_text(strip=True)
+                            else:
+                                title = Path(self.source).stem
+                            if self.content_cmd:
+                                content = soup.select(self.content_cmd)[0]
+                            else:
+                                content = soup
+
+                            cmd = f'echo "{content}" | pandoc -f html -t plain '
+
+                            process = subprocess.run(cmd, shell = True, capture_output= True, text = True)
+                            
+                            self.label = title
+
+                            self.content.extend([''])
+                            self.content.extend(process.stdout.splitlines())
+
+                        ## If not dump its content
+                        else:
+                            if self.title_cmd:
+                                title = self.title_cmd
+                            else:
+                                title = Path(self.source).stem
+                            self.label = title
+                            self.content.extend([''])
+                            self.content.extend(file.read().splitlines())
+                        return self
+                else:
+                    print(f"[Warning]: Was not possible to parse content from {path=} {self.source=}")
+                    return self
 
 
     ## Output methods -----------------

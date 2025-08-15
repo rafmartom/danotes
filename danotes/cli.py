@@ -123,7 +123,7 @@ def main():
           danotes link write test-sample/file.dan --new-label "New Link"
 
           # (For EGB) Update a certain EGB block acording to source
-          danotes block source test-sample/new-format.dan --buid 2
+          danotes block source test-sample/new-format.dan --buid 6
 
           # (For EGB) Update all EGB blocks according to their sources
           danotes block source test-sample/new-format.dan
@@ -133,12 +133,16 @@ def main():
           ## For webs
           danotes block source test-sample/new-format.dan --source "https://requests.readthedocs.io/en/latest/" --title "h1" --content "section"
 
+          ## For readable files
+          danotes block source test-sample/new-format.dan --source "/etc/hostname"
+
           ## For man pages
-          danotes block source test-sample/new-format.dan --source "man true" 
+          danotes block source test-sample/new-format.dan --source "man true"  --title "true"
           ## For help
           danotes block source test-sample/new-format.dan --source "true --help" 
           ## For cmd's (you need to specify --title)
           danotes block source test-sample/new-format.dan --source "hostnamectl | grep -E 'Operating System|Kernel|Architecture'" --title "Operative System Keynel Architecture"
+
 
           # Update the Block Toc and the file 
           danotes file update toc test-sample/file.dan

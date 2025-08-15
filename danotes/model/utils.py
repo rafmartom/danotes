@@ -6,10 +6,13 @@ import re
 import json
 import pyfiglet
 from pathlib import Path
+from pathlib import PurePath
 import os
 from typing import Self
 import yaml
 import danotes.model
+import urllib.parse
+import subprocess
 
 
 ## ----------------------------------------------------------------------------
@@ -140,6 +143,59 @@ def is_a_dir_path(path_str: str) -> bool:
     # Manually check for trailing slash (PurePath strips it)
     return path_str.endswith('/') or path_str.endswith('\\')
 
+def is_url(string: str) -> bool:
+    """Basic check if the string is a URL."""
+    return bool(re.match(r'^(?:http|https|ftp)://\S+\.\S+$', string))
+
+
+def index_file(url: str, path: str) -> tuple[Path, str]:
+    """
+    Download a file from a URL to a local directory structure under DOCU_PATH.
+    Creates necessary subdirectories if they don't exist.
+
+    Args:
+        url (str): The URL of the file to download.
+        path (str): Base path for downloads.
+
+    Returns:
+        tuple[Path, str]: (download_directory, filename)
+    """
+    # Parse URL and handle filename
+    parsed_url = urllib.parse.urlparse(url)
+    url_path = f"{parsed_url.netloc}/{parsed_url.path.lstrip('/')}"
+
+
+    # Split into directory path and filename
+    *dirparts, last_part = url_path.split('/') if url_path else []
+    dirpath = '/'.join(dirparts)
+    filename = last_part or "index.html"
+
+    # Create base paths using pathlib
+    base_path = Path(path).parent / Path(path).stem
+    downloaded_path = base_path / "downloaded"
+
+    # Create the full target directory path
+    full_dirpath = downloaded_path / dirpath
+    full_dirpath.mkdir(parents=True, exist_ok=True)
+
+    # Construct the wget command
+    cmd = [
+        "wget",
+        "-nc",  # No-clobber
+        "--adjust-extension",
+        f"--directory-prefix={full_dirpath}",
+        url
+    ]
+
+    try:
+        subprocess.run(cmd, check=True, capture_output=True, text=True)
+        print(f"Successfully downloaded {url} to {full_dirpath/filename}")
+        return (full_dirpath, filename)
+    except subprocess.CalledProcessError as e:
+        print(f"Error downloading {url}: {e.stderr}")
+        raise  # Re-raise the exception for the caller to handle
+
+
 
 ## EOF EOF EOF HELPERS 
 ## ----------------------------------------------------------------------------
@@ -198,4 +254,4 @@ def append_after_third_last_line(file_path, string_to_append, estimated_max_line
 ## EOF EOF EOF CORE_SUBROUTINES 
 ## ----------------------------------------------------------------------------
 
-__all__ = [ 'is_valid_dan_format' , 'append_after_third_last_line', 'get_next_uid', 'transform_legacy_title', 'check_yaml_line', 'is_a_dir_path']
+__all__ = [ 'is_valid_dan_format' , 'append_after_third_last_line', 'get_next_uid', 'transform_legacy_title', 'check_yaml_line', 'is_a_dir_path', 'is_url', 'index_file']

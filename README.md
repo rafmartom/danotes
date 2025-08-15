@@ -443,6 +443,13 @@ danotes link write test-sample/new-format.dano --new-label 'My link'
 
 
 
+## Relative and absoulte EGB
+danotes block source test-sample/new-format.dan --source "./new-format/downloaded/motherfuckingwebsite.com/index.html" --title "h1" --content "body"
+danotes block source test-sample/new-format.dan --source "./new-format/downloaded/motherfuckingwebsite.com/index.html"
+danotes block source test-sample/new-format.dan --source "/home/fakuve/myrepos/rafmartom/danotes/test-sample/new-format/downloaded/motherfuckingwebsite.com/index.html" --title "h1" --content "body"
+danotes block source test-sample/new-format.dan --source "/home/fakuve/myrepos/rafmartom/danotes/test-sample/new-format/downloaded/motherfuckingwebsite.com/index.html"
+
+
 ## Debugging interactively
 python3 -i -c 'from danotes import *'
 danom = Danom()

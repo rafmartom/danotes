@@ -127,9 +127,16 @@ def block_source(path, buid=None, source=None, title=None, content=None, json=Fa
         block = danom.create_new_block(buid, title)
         block.source = source
         block.content.append(f'source: "{source}"')
-        block.title_cmd = title
-        block.update_content()
-        danom.to_file(path)
+        if title:
+            block.title_cmd = title
+            block.content.append(f'title_cmd: "{title}"')
+        if content:
+            block.content_cmd = content
+            block.content.append(f'content_cmd: "{content}"')
+        block.update_content(path)
     else:
-        pass
-        # @todo
+        for block in danom:
+            block.update_content(path)
+
+    danom.to_file(path)
+    return block.buid

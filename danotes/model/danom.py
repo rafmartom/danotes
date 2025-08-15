@@ -251,7 +251,7 @@ class Danom(list):
         for i, block in enumerate(self):
             if i < 2:
                 continue
-            new_buid = get_next_uid(block.buid)
+            new_buid = danotes.model.get_next_uid(block.buid)
             block.buid = new_buid
 
         # Change B=1 label to Document TOC
