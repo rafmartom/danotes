@@ -22,3 +22,9 @@ dependencies = [
 
 [project.scripts]
 danotes = "danotes.cli:main"
+
+[tool.setuptools.package-data]
+danotes = [
+  "filters/builtin/*.lua",
+  "filters/user/*.lua"
+]

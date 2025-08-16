@@ -42,6 +42,9 @@ class Header:
             output.append(f'title_cmd: "{self.block.title_cmd}"')
         if self.block.content_cmd:
             output.append(f'content_cmd: "{self.block.content_cmd}"')
+        if self.block.filters:
+            output.append(f'filters: "{self.block.filters}"')
+
 
         output.append('')
         output.append('')

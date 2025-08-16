@@ -27,6 +27,7 @@ class Danom(list):
             source = ''
             title_cmd = ''
             content_cmd = ''
+            filters = ''
             content = danotes.model.Content()
 
             while True:
@@ -34,7 +35,7 @@ class Danom(list):
 
                 if line == '':
                     if inside_block:  # If file ends while still in a block, save it
-                        self.append(danotes.model.Block(label, buid, content, title_marked=title_marked, source=source, title_cmd=title_cmd, content_cmd=content_cmd))
+                        self.append(danotes.model.Block(label, buid, content, title_marked=title_marked, source=source, title_cmd=title_cmd, filters=filters, content_cmd=content_cmd))
                     break
 
                 if inside_block == False:
@@ -63,17 +64,19 @@ class Danom(list):
                             source = yaml_var.get('source', source)
                             title_cmd = yaml_var.get('title_cmd', title_cmd)
                             content_cmd = yaml_var.get('content_cmd', content_cmd)
+                            filters = yaml_var.get('filters', filters)
                         else:
                             if re.search(r'^<T>$', line):
                                 inside_header = False
                     else:
                         if re.search(r'^</B>.*', line):
                             inside_block = False
-                            self.append(danotes.model.Block(label, buid, content, title_marked=title_marked, source=source, title_cmd=title_cmd, content_cmd=content_cmd))   ## Create the Danom Block Object
+                            self.append(danotes.model.Block(label, buid, content, title_marked=title_marked, source=source, title_cmd=title_cmd, filters=filters, content_cmd=content_cmd))   ## Create the Danom Block Object
                             # Need to restart the vars
                             source = ''
                             title_cmd = ''
                             content_cmd = ''
+                            filters = ''
                         else:
                             content.append(line.rstrip('\n')) 
 

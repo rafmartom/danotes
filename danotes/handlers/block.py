@@ -111,10 +111,10 @@ def block_show(path, buid=None, label=None, json=False, text=False):
 
 
 
-def block_source(path, buid=None, source=None, title=None, content=None, json=False, text=False):
+def block_source(path, buid=None, source=None, title=None, content=None, filters=None, json=False, text=False):
     """Sourcing a block or the whole document (Updating according to source information)
     """
-    print(f"Sourcing the block {path} {buid=} {source=} {title=} {content=} {json=} {text=}")
+    print(f"Sourcing the block {path} {buid=} {source=} {title=} {content=} {filters=} {json=} {text=}")
 
     if not is_valid_dan_format(path):
         raise ValueError(f"{path} Invalid file type. Expected .dan syntax within. If the path is correct you may want to fix it")
@@ -127,13 +127,12 @@ def block_source(path, buid=None, source=None, title=None, content=None, json=Fa
     if source:
         block = danom.create_new_block(buid, title)
         block.source = source
-        block.content.append(f'source: "{source}"')
         if title:
             block.title_cmd = title
-            block.content.append(f'title_cmd: "{title}"')
         if content:
             block.content_cmd = content
-            block.content.append(f'content_cmd: "{content}"')
+        if filters:
+            block.filters = filters
         block.update_content(path)
     else:
         for block in danom:

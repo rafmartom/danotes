@@ -12,6 +12,7 @@ import yaml
 import danotes.model
 import subprocess
 from bs4 import BeautifulSoup, Comment
+from importlib import resources
 
 class Block():
     """DAN Block Elements that get printed out and displayed, they contain the Inline elements"""
@@ -24,7 +25,8 @@ class Block():
         title_marked: bool = False,
         source: str = '',
         title_cmd: str = '',
-        content_cmd: str = ''
+        content_cmd: str = '',
+        filters: str = ''
     ):
         """Initialize the object with content and metadata.
 
@@ -46,11 +48,12 @@ class Block():
         self.source = source
         self.title_cmd = title_cmd
         self.content_cmd = content_cmd
+        self.filters = filters
     def __repr__(self):
         content_preview = ', '.join([repr(line.strip()) for line in self.content[:3]])
         if len(self.content) > 3:
             content_preview += f', ...(+{len(self.content)-3} more lines)'
-        return f"Block(buid='{self.buid}', label='{self.label}', content=[{content_preview}], links_target={repr(self.links_target)}, title_marked='{self.title_marked}', source='{self.source}', title_cmd='{self.title_cmd}', content_cmd='{self.content_cmd}')"
+        return f"Block(buid='{self.buid}', label='{self.label}', content=[{content_preview}], links_target={repr(self.links_target)}, title_marked='{self.title_marked}', source='{self.source}', title_cmd='{self.title_cmd}', content_cmd='{self.content_cmd}, filters='{self.filters}')"
     def to_dict(self) -> dict[str, any]:
         """Convert the Block to a JSON-serializable dictionary."""
         return {
@@ -191,7 +194,28 @@ class Block():
                         else:
                             content = soup.body
 
-                    cmd = f'echo "{content}" | pandoc -f html -t plain '
+                        if self.filters:
+                            filters = self.filters.split(',')
+                            filters_cmd = ''
+
+                            for filter_name in filters:
+                                # Check user filters first
+                                resource = resources.files("danotes.filters.user").joinpath(f"{filter_name}.lua")
+                                if resource.is_file():
+                                    with resources.as_file(resource) as path:
+                                        filters_cmd += f' -L {str(path)}'
+                                    continue  # skip checking builtin if found in user
+
+                                # Check builtin filters
+                                resource = resources.files("danotes.filters.builtin").joinpath(f"{filter_name}.lua")
+                                if resource.is_file():
+                                    with resources.as_file(resource) as path:
+                                        filters_cmd += f' -L {str(path)}'
+                        else:
+                            filters_cmd = ''
+
+
+                    cmd = f'echo "{content}" | pandoc -f html -t plain {filters_cmd}'
                     process = subprocess.run(cmd, shell = True, capture_output= True, text = True)
 
                     self.label = title
@@ -246,7 +270,27 @@ class Block():
                             else:
                                 content = soup
 
-                            cmd = f'echo "{content}" | pandoc -f html -t plain '
+                            if self.filters:
+                                filters = self.filters.split(',')
+
+                                for filter_name in filters:
+                                    # Check user filters first
+                                    resource = resources.files("danotes.filters.user").joinpath(f"{filter_name}.lua")
+                                    if resource.is_file():
+                                        with resources.as_file(resource) as path:
+                                            filters_cmd += f' -L {str(path)}'
+                                        continue  # skip checking builtin if found in user
+
+                                    # Check builtin filters
+                                    resource = resources.files("danotes.filters.builtin").joinpath(f"{filter_name}.lua")
+                                    if resource.is_file():
+                                        with resources.as_file(resource) as path:
+                                            filters_cmd += f' -L {str(path)}'
+                            else:
+                                filters_cmd = ''
+
+
+                            cmd = f'echo "{content}" | pandoc -f html -t plain {filters_cmd}'
 
                             process = subprocess.run(cmd, shell = True, capture_output= True, text = True)
                             

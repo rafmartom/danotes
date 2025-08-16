@@ -70,7 +70,7 @@ def cli_block_show(args):
         print(result, end='')
 
 def cli_block_source(args):
-    result = block_source(path=args.path, buid=args.buid, source=args.source, title=args.title, content=args.content, json=args.json, text=args.text)
+    result = block_source(path=args.path, buid=args.buid, source=args.source, title=args.title, content=args.content, filters=args.filters, json=args.json, text=args.text)
     if result is not None:
         print(result, end='')
 
@@ -131,7 +131,7 @@ def main():
           # (For EGB) Create a new EGB block with a certain source
 
           ## For webs
-          danotes block source test-sample/new-format.dan --source "https://requests.readthedocs.io/en/latest/" --title "h1" --content "section"
+          danotes block source test-sample/new-format.dan --source "https://requests.readthedocs.io/en/latest/" --title "h1" --content "section" --filters "helloworld"
 
           ## For readable files
           danotes block source test-sample/new-format.dan --source "/etc/hostname"
@@ -263,6 +263,7 @@ def main():
     block_source_parser.add_argument("--source", help="Path/URL/cmd source of the Generated Content")
     block_source_parser.add_argument("--title", help="Title parsing rules")
     block_source_parser.add_argument("--content", help="Content parsing rules")
+    block_source_parser.add_argument("--filters", help="Pandoc filters to be applied (comma separated string to be read from ./danotes/filters/user/ or ./danotes/filters/builtin/")
     ## EOF EOF EOF BLOCK 
     ## ----------------------------------------------------------------------------
 
