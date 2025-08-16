@@ -33,6 +33,18 @@ class Header:
         if len(lines) > 2:
             lines.pop()
             lines.pop()
+            lines.pop()
+
+        ## Append the EGB info
+        if self.block.source:
+            output.append(f'source: "{self.block.source}"')
+        if self.block.title_cmd:
+            output.append(f'title_cmd: "{self.block.title_cmd}"')
+        if self.block.content_cmd:
+            output.append(f'content_cmd: "{self.block.content_cmd}"')
+
+        output.append('')
+        output.append('')
 
         return '\n'.join(output)
 

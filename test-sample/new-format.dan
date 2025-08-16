@@ -5,6 +5,8 @@
 | (_| | (_| | (_) | |_) |  __/_____| |_) | |_) | | | (_) |
  \__,_|\__,_|\___/|_.__/ \___|     | .__/| .__/|_|  \___/
                                    |_|   |_|
+
+
 <T>
                                                                            
 
@@ -55,28 +57,20 @@ dan_tags: []
 | |_| | (_) | (__| |_| | | | | | |  __/ | | | |_    | || |_| | |___
 |____/ \___/ \___|\__,_|_| |_| |_|\___|_| |_|\__|   |_| \___/ \____|
 
+
+
 <T>
 /
 ├── .
 │   ├── <L=0>adobe-ppro</L>
 │   ├── <L=1>Document TOC</L>
-│   └── <L=2>First Article</L>
-├── home
-│   └── fakuve
-│       └── myrepos
-│           └── rafmartom
-│               └── danotes
-│                   └── test-sample
-│                       └── new-format
-│                           └── downloaded
-│                               └── motherfuckingwebsite.com
-│                                   ├── <L=5>This is a motherfucking website.</L>
-│                                   └── <L=6>index</L>
-├── new-format
-│   └── downloaded
-│       └── motherfuckingwebsite.com
-│           ├── <L=4>This is a motherfucking website.</L>
-│           └── <L=7>index</L>
+│   ├── <L=2>First Article</L>
+│   └── <L=4>true</L>
+├── https:
+│   └── requests.readthedocs.io
+│       └── en
+│           └── latest
+│               └── <L=5>Requests: HTTP for Humans™¶</L>
 └── path
     └── to
         └── <L=3>to</L> (X)
@@ -91,8 +85,12 @@ dan_tags: []
 |  _| | | |  \__ \ |_   / ___ \| |  | |_| | (__| |  __/
 |_|   |_|_|  |___/\__| /_/   \_\_|   \__|_|\___|_|\___|
 
+
+
+- <L=2#1>Part A</L>
+- <L=2#2>Part B</L>
+- <L=2#3>Part C</L>
 <T>
-source: ""
 
 <I=1#1>Part A</I>
 Some text here explaining something
@@ -119,8 +117,12 @@ console.log(myVar)
 | || (_) |
  \__\___/
 
-<T>
+
 source: "./path/to/"
+
+- <L=3#1>Part A</L>
+- <L=3#2>Part B</L>
+<T>
 
 <I=2#1>Part A</I>
 <I=2#2>Part B</I>

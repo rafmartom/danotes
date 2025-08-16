@@ -121,6 +121,7 @@ def block_source(path, buid=None, source=None, title=None, content=None, json=Fa
 
     danom = Danom()
     danom.load(path)
+    danom.get_links_target()
 
     ## Create a new Block if source is been inputed
     if source:

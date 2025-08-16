@@ -57,8 +57,15 @@ class Danom(list):
                         content = danotes.model.Content()
                 else:
                     if inside_header == True:
-                        if re.search(r'^<T>$', line):
-                            inside_header = False
+                        yaml_var = danotes.model.check_yaml_line(line)
+                        if yaml_var:
+                            # Extract variables if they exist, else set to None
+                            source = yaml_var.get('source', source)
+                            title_cmd = yaml_var.get('title_cmd', title_cmd)
+                            content_cmd = yaml_var.get('content_cmd', content_cmd)
+                        else:
+                            if re.search(r'^<T>$', line):
+                                inside_header = False
                     else:
                         if re.search(r'^</B>.*', line):
                             inside_block = False
@@ -68,19 +75,7 @@ class Danom(list):
                             title_cmd = ''
                             content_cmd = ''
                         else:
-                            if inside_yaml:
-                                yaml_var = danotes.model.check_yaml_line(line)
-                                if yaml_var:
-                                    # Extract variables if they exist, else set to None
-                                    source = yaml_var.get('source', source)
-                                    title_cmd = yaml_var.get('title_cmd', title_cmd)
-                                    content_cmd = yaml_var.get('content_cmd', content_cmd)
-                                    content.append(line.rstrip('\n')) 
-                                else:
-                                    inside_yaml = False
-                                    content.append(line.rstrip('\n')) 
-                            else:
-                                content.append(line.rstrip('\n')) 
+                            content.append(line.rstrip('\n')) 
 
 
         ## Deleting the trailing empty line (lower-padding) that is added

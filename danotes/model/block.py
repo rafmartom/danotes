@@ -149,14 +149,6 @@ class Block():
         ## Re-instating the content from 0
         self.content = danotes.model.Content()
 
-        if self.source:
-            self.content.append(f'source: "{self.source}"')
-        if self.title_cmd:
-            self.content.append(f'title_cmd: "{self.title_cmd}"')
-        if self.content_cmd:
-            self.content.append(f'content_cmd: "{self.content_cmd}"')
-
-
         process = subprocess.run(self.source, shell = True, capture_output= True, text = True)
 
         if process.returncode == 0:
