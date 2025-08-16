@@ -9,6 +9,12 @@ setup(
     license="MIT",
     packages=find_packages(),
     include_package_data=True,
+    package_data={
+        "danotes": [
+            "filters/builtin/*.lua",
+            "filters/user/*.lua"
+        ],
+    },
     install_requires=[
         "pyfiglet>=1.0.3",
         "pyyaml>=6.0",

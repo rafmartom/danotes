@@ -1,3 +1,5 @@
+danotes/filters/user/*.lua
+
 # Virtual environments
 venv/
 .env/
