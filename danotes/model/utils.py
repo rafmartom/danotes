@@ -89,7 +89,6 @@ def create_new_header_block(path):
     content.append('')
 
 
-
 def transform_legacy_title(path):
     path = Path(path)
     basename_no_ext = path.stem
@@ -250,6 +249,20 @@ def append_after_third_last_line(file_path, string_to_append, estimated_max_line
     with open(file_path, 'wb') as f:
         f.write(new_content)
 
+# @todo
+# This should update the file tags, and add the (X) exception at the end
+####def update_tags_file(path):
+####    cmd = ""
+####    
+####    try:
+####        subprocess.run(cmd, check=True, capture_output=True, text=True)
+####        print(f"Successfully downloaded {url} to {full_dirpath/filename}")
+####        return (full_dirpath, filename)
+####    except subprocess.CalledProcessError as e:
+####        print(f"Error downloading {url}: {e.stderr}")
+####        raise  # Re-raise the exception for the caller to handle
+
+    
 
 ## EOF EOF EOF CORE_SUBROUTINES 
 ## ----------------------------------------------------------------------------

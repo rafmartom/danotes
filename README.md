@@ -458,6 +458,18 @@ print(danom[2].links_target)
 
 danom.create_new_header_block('test-sample/new-file.dano')
 
+## Updating the BUID after migration
+python3 -i -c 'from danotes import *'
+danom = Danom()
+path = '/home/fakuve/baul-documents/vim-dan/php-docs.dan'
+danom.load(path)
+
+for block in danom:
+    block.content.shift_links_one_buid()
+danom.to_file_notoc(path)
+
+
+
 
 ## Local Debugging
 gitToTermbin -x "*README.md" -x "*test-sample*"

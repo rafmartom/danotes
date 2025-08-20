@@ -15,6 +15,7 @@ def file_new(path, json=False, text=True):
         return danom.to_text()
     else:
         danom.to_file(path)
+        # @todo update_tags_file(path)
         return f"File {path} has been successfully created.\n"
   
 def file_append(path, query):
@@ -28,6 +29,7 @@ def file_update_toc(path):
     danom.get_links_target()
     danom.update_toc_block()
     danom.to_file(path)
+    # @todo update_tags_file(path)
     return f"{path} toc block has been succesfully update alongside its danom.\n"
 
 def file_update_notoc(path):
@@ -35,6 +37,7 @@ def file_update_notoc(path):
     danom = Danom()
     danom.load(path)
     danom.to_file_notoc(path)
+    # @todo update_tags_file(path)
 
     return f"{path} has been succesfully updated without Block Tocs and Toc Block.\n"
 
@@ -44,6 +47,7 @@ def file_refresh(path):
     danom = danom.load(path)
     danom.get_links_target()
     danom.to_file(path)
+    # @todo update_tags_file(path)
     return f"{path} danom has been successfully updated.\n"
 
 
@@ -55,6 +59,10 @@ def file_migrate(path):
     danom = Danom()
     danom = danom.load(path)
     danom = danom.update_from_legacy()
+    for block in danom:
+        block.content.shift_links_one_buid()
     danom.to_file_notoc(path)
+
+    # @todo update_tags_file(path)
 
     return f"{path} has been successfully migrated to new danotes syntax.\n"

@@ -57,4 +57,34 @@ class Content(list):
         """Get the Content as a contiguous string."""
         return '\n'.join(self)
 
+    def shift_links_one_buid(self) :
+        """
+        Shift all the links in content from BUID , to BUID+1 , either link sources
+        to link targets. 
+        This is to be used in danotes file migrate
+        This is to match with the shift in BUID done to the Block Tags
+        """
+
+        for i, line in enumerate(self):  # Track index with enumerate()
+            # Shift Link Sources
+            matches = re.findall(r'<L=([a-zA-Z0-9]*)', line)
+            if matches:
+                for match in matches:
+                    buid = danotes.model.get_next_uid(match)
+                    pattern = fr'(?<=<L=){re.escape(match)}'
+                    line = re.sub(pattern, buid, line)  # Update line
+            
+            # Shift Link Targets (same approach)
+            matches = re.findall(r'<I=([a-zA-Z0-9]*)', line)
+            if matches:
+                for match in matches:
+                    buid = danotes.model.get_next_uid(match)
+                    pattern = fr'(?<=<I=){re.escape(match)}'
+                    line = re.sub(pattern, buid, line)
+            
+            self[i] = line  # Update the list with modified line
+        return self
+
+
+
 __all__ = [ 'Header', 'Content']

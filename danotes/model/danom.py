@@ -252,6 +252,10 @@ class Danom(list):
             new_buid = danotes.model.get_next_uid(block.buid)
             block.buid = new_buid
 
+        # Shift all BUID's +1 for Link Sources/Link Targets on Content
+        for block in self:
+            block.content.shift_links_one_buid()
+
         # Change B=1 label to Document TOC
         self[1].label = 'Document TOC'
 

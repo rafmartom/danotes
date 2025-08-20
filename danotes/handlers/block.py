@@ -59,6 +59,7 @@ def block_write(path, buid=None, query=None, new_label=None, source=None, json=F
         return block.to_text()
     else:
         danom.to_file(path)
+        # @todo update_tags_file(path)
         return block.buid
 
 
@@ -106,6 +107,7 @@ def block_show(path, buid=None, label=None, json=False, text=False):
         return target.to_text()
     else:
         danom.to_file(path)
+    # @todo update_tags_file(path)
         return f"{path} danom has been successfully updated.\n"
 
 
@@ -139,4 +141,5 @@ def block_source(path, buid=None, source=None, title=None, content=None, filters
             block.update_content(path)
 
     danom.to_file(path)
+    # @todo update_tags_file(path)
     return block.buid
