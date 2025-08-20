@@ -40,7 +40,7 @@ class Danom(list):
 
                 if inside_block == False:
                     ## Checking for all the Block Opening Tags Line
-                    block_otag_match = re.search(r'(?<=<B=)([0-9a-zA-Z]+)>([^<\n]+)', line)
+                    block_otag_match = re.search(r'(?<=<B=)([0-9a-zA-Z]+)>([^\n]+)', line)
                     if block_otag_match:
                         inside_block = True
                         inside_header = True

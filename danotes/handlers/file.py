@@ -59,8 +59,6 @@ def file_migrate(path):
     danom = Danom()
     danom = danom.load(path)
     danom = danom.update_from_legacy()
-    for block in danom:
-        block.content.shift_links_one_buid()
     danom.to_file_notoc(path)
 
     # @todo update_tags_file(path)
