@@ -275,8 +275,14 @@ class Danom(list):
 
             no_lines = len(lines)
 
-            for _ in range(no_lines):
-                block.content.pop(0)
+            for line_no in range(no_lines):
+                # Additional safety check, avoids fatal error on blocks with no content
+                if block.content and block.content[0]:
+                    block.content.pop(0)
+                else:
+                    print(f"Warning: Tried to pop from a block {i=} with no content or an empty line {line_no=}")
+                    break  # Exit the pop loop early
+
 
         # Transform Header
         # ---------
