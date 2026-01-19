@@ -30,7 +30,7 @@ danotes block write --help
 
 
 `danotes` documents are formed of succesive blocks, each block has asigned a unique id **buid** and a **label** which doesn't have to be unique.
-The first two blocks `buid = 0' and `buid = 1` are unique:
+The first two blocks `buid = 0` and `buid = 1` are unique:
 
 - Block `buid = 0` : Danotes Header
 - Block `buid = 1` : General TOC 
@@ -120,7 +120,7 @@ From `block = 2` onwards they are all Article blocks, they share the same struct
 - The Content part (can hold plain text and DAN Inline Objects)
 - The lower boundary of the block `</B>...` followed by a horizontal line of equal signs `=`
 
-```
+````
 <B=2>First Article
  _____ _          _        _         _   _      _
 |  ___(_)_ __ ___| |_     / \   _ __| |_(_) ___| | ___
@@ -164,7 +164,7 @@ console.log(myVar)
 
 </B><L=1>To General TOC</L> | <L=3>To Article Top</L>
 =========================================================================================================
-```
+````
 
 The Article TOC is Similar to the General TOC, but this allow you quick navigation to the **LinkTarget**'s made of `< I={buid}#{iid}>{label}`
 There are also `Codeblocks` which take the syntax of markdown specifying the filetype, so the text-processor can syntax highlight their contents accordingly.
