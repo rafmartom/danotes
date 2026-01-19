@@ -81,9 +81,6 @@ class Danom(list):
                             content.append(line.rstrip('\n')) 
 
 
-        ## Deleting the trailing empty line (lower-padding) that is added
-        for block in self:
-            block.content.pop()
         return self
 
 
@@ -273,7 +270,7 @@ class Danom(list):
             pyfiglet_string = pyfiglet.figlet_format(block.label)
             lines = [line.rstrip() for line in pyfiglet_string.split('\n')]
 
-            no_lines = len(lines)
+            no_lines = len(lines) - 2
 
             for line_no in range(no_lines):
                 # Additional safety check, avoids fatal error on blocks with no content

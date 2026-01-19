@@ -338,6 +338,5 @@ class Block():
     def to_text(self) -> str:
         """Get the Content of the Block with a horizontal line <hr> at the end"""
         output = self.to_string()
-        output = output + '\n'   ## Adding tralining empty line (lower-padding)
         output = output + f'\n</B><L=1>To Document TOC</L> | <L={self.buid}>Back to Article Top</L>\n'
         return output + ('=' * 105)
