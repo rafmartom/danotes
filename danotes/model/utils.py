@@ -13,6 +13,10 @@ import yaml
 import danotes.model
 import urllib.parse
 import subprocess
+from rapidfuzz import fuzz
+from multiprocessing import Pool, Manager
+from functools import partial
+
 
 
 ## ----------------------------------------------------------------------------
@@ -195,6 +199,48 @@ def index_file(url: str, path: str) -> tuple[Path, str]:
         raise  # Re-raise the exception for the caller to handle
 
 
+def get_vicinity_indices(start_index, limit):
+    """
+    Helper for perform_file_merge .
+    It iterates on lines zig zaging
+    i.e   line_no - 1 , line_no + 1, line_no - 2, line_no + 2
+    """
+    yield start_index # Start exactly at i
+    for offset in range(1, limit):
+        # Check left, then right
+        for next_j in [start_index - offset, start_index + offset]:
+            if 0 <= next_j < limit:
+                yield next_j
+
+def process_line_shared(h_line_tuple, shared_target_lines, threshold):
+    """
+    Helper for perform_file_merge.
+    Worker function accessing a shared proxy of target_lines.
+    """
+    i, h_line = h_line_tuple
+    max_len = len(shared_target_lines)
+
+    for j in get_vicinity_indices(i, max_len):
+        t_line = shared_target_lines[j]
+
+        # 1. Clean the line for checking
+        stripped_t = t_line.strip()
+
+        # 2. Skip if it's empty or entirely made of '='
+        # Added check: len(stripped_t) > 0 ensures all() isn't true for empty strings
+        if not stripped_t or (len(stripped_t) > 0 and all(c == '=' for c in stripped_t)):
+            continue
+
+        # 3. Check if already marked
+        if "(X)" in t_line:
+            continue
+
+        if fuzz.ratio(h_line, t_line) > threshold:
+            # Update the shared list directly
+            shared_target_lines[j] = t_line.rstrip('\n') + " (X)\n"
+            return j
+    return None
+
 
 ## EOF EOF EOF HELPERS 
 ## ----------------------------------------------------------------------------
@@ -204,6 +250,53 @@ def index_file(url: str, path: str) -> tuple[Path, str]:
 ## ----------------------------------------------------------------------------
 # @section CORE_SUBROUTINES
 # @description Subroutines triggered directly by CLI Handlers
+
+
+def perform_file_merge(base_file, target_file, threshold):
+    # --- Configuration ---
+    threshold = threshold
+    base_file_path = base_file
+    target_file_path = target_file
+    target_path = Path(target_file)
+    output_file_path = f"{target_path.stem}-new{target_path.suffix}"
+
+    # 1. Load data
+    high_lines = []
+    with open(base_file_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            if line.endswith(" (X)\n"):
+                high_lines.append(re.sub(r'\s\(X\)$', '', line))
+
+    with open(target_file_path, 'r', encoding='utf-8') as f:
+        raw_target_lines = f.readlines()
+
+    # 2. Setup Manager and Shared List
+    # The Manager process holds the 'source of truth' for target_lines
+    with Manager() as manager:
+        shared_target_lines = manager.list(raw_target_lines)
+        
+        # Prepare the function with fixed arguments (shared list and threshold)
+        # partial() allows us to pass these to the map function easily
+        worker_func = partial(process_line_shared, 
+                              shared_target_lines=shared_target_lines, 
+                              threshold=threshold)
+
+        # 3. Use Pool to execute
+        # enumerate(high_lines) gives us (index, string) tuples
+        with Pool() as pool:
+            print(f"Starting parallel processing with Shared Manager...")
+            pool.map(worker_func, enumerate(high_lines))
+
+        # 4. Convert shared list back to standard list for writing
+        final_output = list(shared_target_lines)
+
+    # 5. Export
+    with open(output_file_path, 'w', encoding='utf-8') as f:
+        f.writelines(final_output)
+    
+    print(f"Processing completed. on {output_file_path}")
+
+
 
 def is_valid_dan_format(path):
     """Return if the file has proper .dan format"""
@@ -267,4 +360,4 @@ def append_after_third_last_line(file_path, string_to_append, estimated_max_line
 ## EOF EOF EOF CORE_SUBROUTINES 
 ## ----------------------------------------------------------------------------
 
-__all__ = [ 'is_valid_dan_format' , 'append_after_third_last_line', 'get_next_uid', 'transform_legacy_title', 'check_yaml_line', 'is_a_dir_path', 'is_url', 'index_file']
+__all__ = [ 'is_valid_dan_format' , 'append_after_third_last_line', 'get_next_uid', 'transform_legacy_title', 'check_yaml_line', 'is_a_dir_path', 'is_url', 'index_file', 'perform_file_merge']

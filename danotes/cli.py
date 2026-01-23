@@ -51,6 +51,10 @@ def cli_file_migrate(args):
         print(result, end='')
 
 
+def cli_file_merge(args):
+    result = file_merge(base_file=args.base_file, target_file=args.target_file, threshold=args.threshold)
+    if result is not None:
+        print(result, end='')
 
 def cli_block_write(args):
     # Handle stdin if no query provided
@@ -206,7 +210,12 @@ def main():
     file_migrate_parser = file_subparsers.add_parser("migrate", help=file_migrate.__doc__, description=file_migrate.__doc__)
     file_migrate_parser.add_argument("path", help="Input file")
 
+    # file merge
+    file_merge_parser = file_subparsers.add_parser("merge", help=file_migrate.__doc__, description=file_migrate.__doc__)
+    file_merge_parser.add_argument("base_file", help="Base file")
+    file_merge_parser.add_argument("target_file", help="Target file")
 
+    file_merge_parser.add_argument("-t", "--threshold", type=float, default=90.0, help="Threshold for the diff algorythm (0-100) Def: 90")
     ## EOF EOF EOF FILE 
     ## ----------------------------------------------------------------------------
 
@@ -334,6 +343,8 @@ def main():
             cli_file_refresh(args)
         if args.subcommand == "migrate":
             cli_file_migrate(args)
+        if args.subcommand == "merge":
+            cli_file_merge(args)
 
 
     if args.command == "block":

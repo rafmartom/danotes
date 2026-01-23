@@ -9,5 +9,5 @@ from .utils import *
 __all__ = [
     'Block', 'Danom', 'Content', 'Header', 'LinkTarget', 'LinksTarget',
     'is_valid_dan_format', 'append_after_third_last_line',
-    'get_next_uid', 'transform_legacy_title' , 'check_yaml_line'
+    'get_next_uid', 'transform_legacy_title' , 'check_yaml_line', 'perform_file_merge'
 ]

@@ -270,7 +270,7 @@ class Danom(list):
             pyfiglet_string = pyfiglet.figlet_format(block.label)
             lines = [line.rstrip() for line in pyfiglet_string.split('\n')]
 
-            no_lines = len(lines) - 2
+            no_lines = len(lines) - 1
 
             for line_no in range(no_lines):
                 # Additional safety check, avoids fatal error on blocks with no content

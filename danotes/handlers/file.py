@@ -64,3 +64,23 @@ def file_migrate(path):
     # @todo update_tags_file(path)
 
     return f"{path} has been successfully migrated to new danotes syntax.\n"
+
+
+import sys
+def file_merge(base_file, target_file, threshold=90):
+    """
+    Merge a Base File DAN anotated (Finnished on (X)) on a Target File.
+    Only lines that are significantly similar will be annotated on target_file
+    """
+
+    sys.stderr.write(f'[DEBUG]: {base_file=}')                    ## DEBUGGING
+    sys.stderr.write(f'[DEBUG]: {target_file=}')                    ## DEBUGGING
+    sys.stderr.write(f'[DEBUG]: {threshold=}')                    ## DEBUGGING
+
+
+
+   
+    perform_file_merge(base_file, target_file, threshold)
+
+
+    return f"Merge of {target_file} according to {base_file} has finnished.\n"

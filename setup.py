@@ -20,7 +20,8 @@ setup(
         "pyyaml>=6.0",
         "treelib>=1.8.0",
         "beautifulsoup4>=4.13.4",
-        "lxml>=6.0.0"
+        "lxml>=6.0.0",
+        "RapidFuzz>=3.14.3"
         ],
     entry_points={
         "console_scripts": [
